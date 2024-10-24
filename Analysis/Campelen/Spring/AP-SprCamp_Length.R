@@ -1,0 +1,82 @@
+# Set up data
+source("./Analysis/Campelen/Spring/SprCamp-SetUp.R")
+
+# Set up model env
+n <- c(length(trawlf$year),
+       length(ap1$year))
+pa <- c(trawlf$pa, 
+        ap1$pa)
+year <- c(trawlf$year, 
+          ap1$year)
+names <- c("Trawl", "ap1")
+id <- c(seq(0,(length(names)-1)))
+
+
+sd_temp <- c(sd(trawlf$bot.temp),
+             sd(ap1$bot.temp))
+topt <- c(median(trawlf$bot.temp), 
+          median(ap1$bot.temp))
+temp <- c(trawlf$bot.temp, 
+          ap1$bot.temp)
+
+
+spp_n <- c(length(trawlf$year), 
+           sum(length(ap1$year)))
+spp_id <- c(0,1)
+
+model <- 0
+
+ap_fishy_dat <- data.frame(pa = pa, 
+                        year = year, 
+                        names = rep(names, n),
+                        idmod = rep(model, sum(n)),
+                        idex = rep(id, n),
+                        temp = temp,
+                        isd_temp = rep(sd_temp, n),
+                        itopt = rep(topt, n))
+
+omega <- data.frame(species = ap_fishy_dat$names, value = rep(NA, length(ap_fishy_dat$pa)))
+for(i in 1:length(ap_fishy_dat$pa)){
+  omega[i,2] = (1/(ap_fishy_dat$isd_temp[i]*sqrt(2*pi)))*exp((-0.5)*((ap_fishy_dat$temp[i]-ap_fishy_dat$itopt[i])/ap_fishy_dat$isd_temp[i])^2)
+}
+omega <- omega %>% group_by(species) %>% mutate(min = min(value), max = max(value))
+
+ap_tmb_data <- list(n = length(ap_fishy_dat$pa),
+                    nyrs = length(unique(ap_fishy_dat$year)),
+                    iyear = ap_fishy_dat$year - min(ap_fishy_dat$year),
+                    k = 1,
+                    pa = ap_fishy_dat$pa,
+                    idmod = ap_fishy_dat$idmod,
+                    ndex = length(unique(ap_fishy_dat$idex)),
+                    idex = ap_fishy_dat$idex,
+                    omega = omega$value,
+                    Omin = unique(omega$min)[2:length(n)],
+                    Omax = unique(omega$max)[2:length(n)]
+)
+
+ap_param_list <- list(
+  iye = seq(from = log(10), to = log(20), length.out = ap_tmb_data$nyrs),
+  logrw_var = log(1),
+  lchi = c(rep(log(0.5), (length(n)-1))),
+  lbeta = c(rep(log(0.5), (length(n)-1))),
+  lscl = c(rep(log(0.75), (length(n)-1)))
+)
+
+
+
+
+
+map <- list(lscl = as.factor(c(rep(NA, length(ap_param_list$lscl)))))
+
+obj <- MakeADFun(data = ap_tmb_data, map=map,
+                 parameters = ap_param_list,
+                 DLL = "SclNLFPM", 
+                 random = c("iye"))
+
+opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 10, eval.max = 2000, iter.max = 1000), silent = TRUE)
+
+
+ap_rep <- obj$report()
+ap_sdrep <- sdreport(obj)
+# ac_sdrep
+# 2*opt$objective + 2*length(opt$par)

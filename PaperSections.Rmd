@@ -1,0 +1,651 @@
+# Setup Env
+
+```{r include=FALSE}
+library(tidyverse)
+library(ggpubr)
+library(cowplot)
+```
+
+# Abundance Section
+
+## Acoustic
+
+### Campelen
+
+```{r}
+# acc_surv <- read.csv("./Data/Capelin_AccSurv.csv") %>% filter(Year > 1980) %>% rename(acsurv_bm = names(Capelin_AccSurv)[2])
+acc_surv <- read.csv("./Data/Capelin_AccSurv.csv") %>% 
+  filter(Year > 1994) %>% rename(acsurv_bm = X3L.Spring..Acoustic.Capelin.Biomass..kt.)
+
+## Survey year proper
+p1 <- ggplot(data = acc_surv) +
+  geom_line(aes(x = Year, y = acsurv_bm), colour = "#BB2D05", linewidth = 1) +
+  geom_point(aes(x = Year, y = acsurv_bm), size = 1.5, shape = 22, colour = "#BB2D05", fill = "#BB2D05") +
+  scale_x_continuous(name = "Year", expand = c(0,0.1), limits = c(1995, 2020.9), breaks = c(seq(1995, 2020, 5))) + 
+  scale_y_continuous(name = "3L Spring  Acoustic Capelin Biomass (kt)", expand = c(0.009,0), limits = c(0, 1100)) +
+  ggtitle("Campelen\na) Spring") +
+  theme_classic() +
+  theme(legend.position = "none",
+        legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"), legend.spacing.x = unit(0,'cm'),
+        axis.line.x = element_line(size = 0.7), axis.text =  element_text(size = 11), axis.title = element_text(size = 13, face = "bold"), 
+        plot.title = element_text(size = 16, face = "bold"))
+```
+
+### Engel
+
+```{r}
+acc_surv <- read.csv("./Data/Capelin_AccSurv.csv") %>% 
+  filter(Year > 1980 & Year < 1996) %>% rename(acsurv_bm = X3L.Spring..Acoustic.Capelin.Biomass..kt.)
+
+## Survey year proper
+p2 <- ggplot(data = acc_surv) +
+  geom_line(aes(x = Year, y = acsurv_bm), colour = "#BB2D05", linewidth = 1) +
+  geom_point(aes(x = Year, y = acsurv_bm), size = 1.5, shape = 22, colour = "#BB2D05", fill = "#BB2D05") +
+  scale_x_continuous(name = "Year", expand = c(0.009,0), limits = c(1981,1995.1), breaks = c(seq(1981,1995, 3))) + 
+  scale_y_continuous(name = "3L Spring  Acoustic Capelin Biomass (kt)", expand = c(0.009,0), limits = c(0,6000)) +
+  ggtitle("Engel\nb) Spring") +
+  theme_classic() +
+  theme(legend.position = "none",
+        legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"), legend.spacing.x = unit(0,'cm'),
+        axis.line.x = element_line(size = 0.7), axis.text =  element_text(size = 11), axis.title = element_text(size = 13, face = "bold"), 
+        plot.title = element_text(size = 16, face = "bold"))
+```
+
+## Campelen
+
+### Spring
+
+```{r}
+load(file = "./ModelSaves/AP-SprCamp_Length.RData")
+load(file = "./ModelSaves/GH-SprCamp_Length.RData")
+
+# Set up index df - GH
+gh_data <- gh_fishy_dat
+gh_uni_names <- unique(gh_data$names)
+gh_dat_names <- c("Index", gh_uni_names)
+
+gh_new_list <- list()
+for(i in 1:length(gh_uni_names)){
+  gh_one_dex <- subset(gh_data, names == gh_uni_names[i])
+  gh_new_list[[i]] <- aggregate(gh_one_dex$pa, by = list(gh_one_dex$year), FUN = mean, na.rm = TRUE)
+}
+
+gh_multi_inner <- Reduce(
+  function(x, y, ...) plyr::join(x, y, by = "Group.1", ...), 
+  gh_new_list
+)
+
+# Set up index df - AC
+ap_data <- ap_fishy_dat
+ap_uni_names <- unique(ap_data$names)
+ap_dat_names <- c("Index", ap_uni_names)
+
+ap_new_list <- list()
+for(i in 1:length(ap_uni_names)){
+  ap_one_dex <- subset(ap_data, names == ap_uni_names[i])
+  ap_new_list[[i]] <- aggregate(ap_one_dex$pa, by = list(ap_one_dex$year), FUN = mean, na.rm = TRUE)
+}
+
+ap_multi_inner <- Reduce(
+  function(x, y, ...) plyr::join(x, y, by = "Group.1", ...), 
+  ap_new_list
+)
+
+gh_low_rho = gh_sdrep$value[names(gh_sdrep$value) == "iye"] - qnorm(0.975)*gh_sdrep$sd[names(gh_sdrep$value) == "iye"]
+gh_high_rho = gh_sdrep$value[names(gh_sdrep$value) == "iye"] + qnorm(0.975)*gh_sdrep$sd[names(gh_sdrep$value) == "iye"]
+gh_ts_df <- data.frame(ts = gh_rep$iye, time = gh_multi_inner[,1], low_sd = gh_low_rho, high_sd = gh_high_rho)
+
+ap_low_rho = ap_sdrep$value[names(ap_sdrep$value) == "iye"] - qnorm(0.975)*ap_sdrep$sd[names(ap_sdrep$value) == "iye"]
+ap_high_rho = ap_sdrep$value[names(ap_sdrep$value) == "iye"] + qnorm(0.975)*ap_sdrep$sd[names(ap_sdrep$value) == "iye"]
+ap_ts_df <- data.frame(ts = ap_rep$iye, time = ap_multi_inner[,1], low_sd = ap_low_rho, high_sd = ap_high_rho)
+
+p3 <- ggplot() +
+  geom_line(aes(x = 0, y = 0, colour = "all"), size = 1.5) +
+  geom_point(aes(x = 0, y = 0, colour = "all"), size = 1.5) +
+  
+  geom_line(aes(x = 0, y = 0, colour = "surv"), size = 1.5) +
+  geom_point(aes(x = 0, y = 0, colour = "surv"), size = 1.5) +
+
+    
+  geom_ribbon(data = gh_ts_df, aes(x = time, y = ts, ymin = low_sd, ymax = high_sd), alpha = 0.2) +
+  geom_line(data = gh_ts_df, aes(x = time, y = ts, colour = "gh"), size = 1.5) +
+  geom_point(data = gh_ts_df, aes(x = time, y = ts, colour = "gh"), size = 1.5) +
+  
+  geom_ribbon(data = ap_ts_df, aes(x = time, y = ts, ymin = low_sd, ymax = high_sd), alpha = 0.2) +
+  geom_line(data = ap_ts_df, aes(x = time, y = ts, colour = "ap"), size = 1.5) +
+  geom_point(data = ap_ts_df, aes(x = time, y = ts, colour = "ap"), size = 1.5) +
+  
+  scale_x_continuous(name = "Year", expand = c(0,0.1), limits = c(1995,2021), breaks = c(seq(1995, 2021, 5))) + 
+  scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.6,2.4)) +
+  scale_color_manual(name = "Species Model", values = c(all = "black", surv = "#BB2D05", ap = "#FF7733", gh = "#048BA8"),
+                     labels = c(all = "All species", surv = "Acoustic survey", ap = "Plaice", gh = "Greenland halibut")) +
+  guides(colour = guide_legend(keyheight = 0.4, default.unit = "cm")) +
+  ggtitle("c) Spring") +
+  theme_classic() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"), legend.spacing.x = unit(0,'cm'),
+        axis.text = element_text(size = 11), axis.title = element_text(size = 13,face = "bold"),
+        plot.title = element_text(size = 16, face = "bold"))
+```
+
+### Fall
+
+```{r}
+load(file = "./ModelSaves/FallCamp_Length.RData")
+
+data <- fishy_dat
+uni_names <- unique(data$names)
+dat_names <- c("Index", uni_names)
+
+new_list <- list()
+for(i in 1:length(uni_names)){
+  one_dex <- subset(data, names == uni_names[i])
+  new_list[[i]] <- aggregate(one_dex$pa, by = list(one_dex$year), FUN = mean, na.rm = TRUE)
+}
+
+multi_inner <- Reduce(
+  function(x, y, ...) plyr::join(x, y, by = "Group.1", ...), 
+  new_list)
+
+# Confidence intervals
+low_rho = sdrep$value[names(sdrep$value) == "iye"] - qnorm(0.975)*sdrep$sd[names(sdrep$value) == "iye"]
+high_rho = sdrep$value[names(sdrep$value) == "iye"] + qnorm(0.975)*sdrep$sd[names(sdrep$value) == "iye"]
+ts_df <- data.frame(ts = rep$iye, year = multi_inner[,1], low_sd = low_rho, high_sd = high_rho) %>% mutate(acc_year = multi_inner[,1]+1)
+
+p4 <- ggplot() +
+  geom_ribbon(data = ts_df, aes(x = acc_year, y = ts, ymin = low_sd, ymax = high_sd), alpha = 0.2) +
+  geom_point(data = ts_df, aes(x = acc_year, y = ts, colour = "all")) +
+  geom_line(data = ts_df, aes(x = acc_year, y = ts, colour = "all" ), size = 1.5) +
+
+  scale_x_continuous(name = "Year+1", expand = c(0,0.1), limits = c(1995,2022), breaks = c(seq(1995, 2022, 5))) + 
+  scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.45, 1.08)) +
+  scale_color_manual(name = "Species Model", values = c(all = "black", ac = "#BC8DA0", gh = "#048BA8"),
+                     labels = c(all = "All species", ac = "Cod/ Plaice", gh = "Greenland halibut")) +
+  guides(colour = guide_legend(keyheight = 0.4, default.unit = "cm")) +
+  ggtitle("e) Fall") +
+  theme_classic() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"), legend.spacing.x = unit(0,'cm'),
+        axis.text = element_text(size = 11), axis.title = element_text(size = 13,face = "bold"),
+        plot.title = element_text(size = 16, face = "bold"))
+```
+
+## Engel
+
+### Spring
+
+```{r}
+load(file = "./ModelSaves/ACAP-SprEng_Length.RData")
+load(file = "./ModelSaves/GH-SprEng_Length.RData")
+
+# Set up index df - GH
+gh_data <- gh_fishy_dat
+gh_uni_names <- unique(gh_data$names)
+gh_dat_names <- c("Index", gh_uni_names)
+
+gh_new_list <- list()
+for(i in 1:length(gh_uni_names)){
+  gh_one_dex <- subset(gh_data, names == gh_uni_names[i])
+  gh_new_list[[i]] <- aggregate(gh_one_dex$pa, by = list(gh_one_dex$year), FUN = mean, na.rm = TRUE)
+}
+
+gh_multi_inner <- Reduce(
+  function(x, y, ...) plyr::join(x, y, by = "Group.1", ...), 
+  gh_new_list
+)
+
+# Set up index df - AC
+ac_data <- ac_fishy_dat
+ac_uni_names <- unique(ac_data$names)
+ac_dat_names <- c("Index", ac_uni_names)
+
+ac_new_list <- list()
+for(i in 1:length(ac_uni_names)){
+  ac_one_dex <- subset(ac_data, names == ac_uni_names[i])
+  ac_new_list[[i]] <- aggregate(ac_one_dex$pa, by = list(ac_one_dex$year), FUN = mean, na.rm = TRUE)
+}
+
+ac_multi_inner <- Reduce(
+  function(x, y, ...) plyr::join(x, y, by = "Group.1", ...), 
+  ac_new_list
+)
+
+gh_low_rho = gh_sdrep$value[names(gh_sdrep$value) == "iye"] - qnorm(0.975)*gh_sdrep$sd[names(gh_sdrep$value) == "iye"]
+gh_high_rho = gh_sdrep$value[names(gh_sdrep$value) == "iye"] + qnorm(0.975)*gh_sdrep$sd[names(gh_sdrep$value) == "iye"]
+gh_ts_df <- data.frame(ts = gh_rep$iye, time = gh_multi_inner[,1], low_sd = gh_low_rho, high_sd = gh_high_rho)
+
+ac_low_rho = ac_sdrep$value[names(ac_sdrep$value) == "iye"] - qnorm(0.975)*ac_sdrep$sd[names(ac_sdrep$value) == "iye"]
+ac_high_rho = ac_sdrep$value[names(ac_sdrep$value) == "iye"] + qnorm(0.975)*ac_sdrep$sd[names(ac_sdrep$value) == "iye"]
+ac_ts_df <- data.frame(ts = ac_rep$iye, time = ac_multi_inner[,1], low_sd = ac_low_rho, high_sd = ac_high_rho)
+
+p5 <- ggplot() +
+  geom_line(aes(x = 0, y = 0, colour = "all"), size = 1.5) +
+  geom_point(aes(x = 0, y = 0, colour = "all"), size = 1.5) +
+  
+  geom_line(aes(x = 0, y = 0, colour = "surv"), size = 1.5) +
+  geom_point(aes(x = 0, y = 0, colour = "surv"), size = 1.5) +
+
+    
+  geom_ribbon(data = gh_ts_df, aes(x = time, y = ts, ymin = low_sd, ymax = high_sd), alpha = 0.2) +
+  geom_line(data = gh_ts_df, aes(x = time, y = ts, colour = "gh"), size = 1.5) +
+  geom_point(data = gh_ts_df, aes(x = time, y = ts, colour = "gh"), size = 1.5) +
+  
+  geom_ribbon(data = ac_ts_df, aes(x = time, y = ts, ymin = low_sd, ymax = high_sd), alpha = 0.2) +
+  geom_line(data = ac_ts_df, aes(x = time, y = ts, colour = "ac"), size = 1.5) +
+  geom_point(data = ac_ts_df, aes(x = time, y = ts, colour = "ac"), size = 1.5) +
+  
+  scale_x_continuous(name = "Year", expand = c(0,0.1), limits = c(1981,1995), breaks = c(seq(1981, 1995, 3))) + 
+  scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.3,2.0)) +
+  scale_color_manual(name = "Species Model", values = c(all = "black", surv = "#BB2D05", ac = "#BC8DA0", gh = "#048BA8"),
+                     labels = c(all = "All species", surv = "Acoustic survey", ac = "Cod/ Plaice", gh = "Greenland halibut")) +
+  guides(colour = guide_legend(keyheight = 0.4, default.unit = "cm")) +
+  ggtitle("c) Spring") +
+  theme_classic() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"), legend.spacing.x = unit(0,'cm'),
+        axis.text = element_text(size = 11), axis.title = element_text(size = 13,face = "bold"),
+        plot.title = element_text(size = 16, face = "bold"))
+```
+
+### Fall
+
+```{r}
+load(file = "./ModelSaves/ACAP-FallEng_Length.RData")
+load(file = "./ModelSaves/GH-FallEng_Length.RData")
+
+# Set up index df - GH
+gh_data <- gh_fishy_dat
+gh_uni_names <- unique(gh_data$names)
+gh_dat_names <- c("Index", gh_uni_names)
+
+gh_new_list <- list()
+for(i in 1:length(gh_uni_names)){
+  gh_one_dex <- subset(gh_data, names == gh_uni_names[i])
+  gh_new_list[[i]] <- aggregate(gh_one_dex$pa, by = list(gh_one_dex$year), FUN = mean, na.rm = TRUE)
+}
+
+gh_multi_inner <- Reduce(
+  function(x, y, ...) plyr::join(x, y, by = "Group.1", ...), 
+  gh_new_list
+)
+
+# Set up index df - AC
+ac_data <- ac_fishy_dat
+ac_uni_names <- unique(ac_data$names)
+ac_dat_names <- c("Index", ac_uni_names)
+
+ac_new_list <- list()
+for(i in 1:length(ac_uni_names)){
+  ac_one_dex <- subset(ac_data, names == ac_uni_names[i])
+  ac_new_list[[i]] <- aggregate(ac_one_dex$pa, by = list(ac_one_dex$year), FUN = mean, na.rm = TRUE)
+}
+
+ac_multi_inner <- Reduce(
+  function(x, y, ...) plyr::join(x, y, by = "Group.1", ...), 
+  ac_new_list
+)
+
+gh_low_rho = gh_sdrep$value[names(gh_sdrep$value) == "iye"] - qnorm(0.975)*gh_sdrep$sd[names(gh_sdrep$value) == "iye"]
+gh_high_rho = gh_sdrep$value[names(gh_sdrep$value) == "iye"] + qnorm(0.975)*gh_sdrep$sd[names(gh_sdrep$value) == "iye"]
+gh_ts_df <- data.frame(ts = gh_rep$iye, time = gh_multi_inner[,1], low_sd = gh_low_rho, high_sd = gh_high_rho) %>% 
+  mutate(acc_year = gh_multi_inner[,1]+1)
+
+ac_low_rho = ac_sdrep$value[names(ac_sdrep$value) == "iye"] - qnorm(0.975)*ac_sdrep$sd[names(ac_sdrep$value) == "iye"]
+ac_high_rho = ac_sdrep$value[names(ac_sdrep$value) == "iye"] + qnorm(0.975)*ac_sdrep$sd[names(ac_sdrep$value) == "iye"]
+ac_ts_df <- data.frame(ts = ac_rep$iye, time = ac_multi_inner[,1], low_sd = ac_low_rho, high_sd = ac_high_rho) %>% 
+  mutate(acc_year = ac_multi_inner[,1]+1)
+
+p6 <- ggplot() +
+  geom_line(aes(x = 0, y = 0, colour = "all"), size = 1.5) +
+  geom_point(aes(x = 0, y = 0, colour = "all"), size = 1.5) +
+
+  geom_line(aes(x = 0, y = 0, colour = "ap"), size = 1.5) +
+  geom_point(aes(x = 0, y = 0, colour = "ap"), size = 1.5) +
+
+  geom_ribbon(data = gh_ts_df, aes(x = acc_year, y = ts, ymin = low_sd, ymax = high_sd), alpha = 0.2) +
+  geom_line(data = gh_ts_df, aes(x = acc_year, y = ts, colour = "gh"), size = 1.5) +
+  geom_point(data = gh_ts_df, aes(x = acc_year, y = ts, colour = "gh"), size = 1.5) +
+  
+  geom_ribbon(data = ac_ts_df, aes(x = acc_year, y = ts, ymin = low_sd, ymax = high_sd), alpha = 0.2) +
+  geom_line(data = ac_ts_df, aes(x = acc_year, y = ts, colour = "ac"), size = 1.5) +
+  geom_point(data = ac_ts_df, aes(x = acc_year, y = ts, colour = "ac"), size = 1.5) +
+  
+  scale_x_continuous(name = "Year+1", expand = c(0,0.1), limits = c(1981,1995), breaks = c(seq(1981, 1995, 3))) + 
+  scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.21,0.75)) +
+  scale_color_manual(name = "Species Model", values = c(all = "black", ac = "#BC8DA0", gh = "#048BA8", ap = "#FF7733"),
+                     labels = c(all = "All species", ac = "Cod/ Plaice", gh = "Greenland halibut", ap = "American plaice")) +
+  guides(colour = guide_legend(keyheight = 0.4, default.unit = "cm")) +
+  ggtitle("f) Fall") +
+  theme_classic() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"), legend.spacing.x = unit(0,'cm'),
+        axis.text = element_text(size = 11), axis.title = element_text(size = 13,face = "bold"),
+        plot.title = element_text(size = 16, face = "bold"))
+```
+
+## - Figure 2
+
+```{r, fig.width = 16, fig.height=13}
+
+p7 <- ggarrange(p1+theme(axis.title.x = element_blank()),
+          p2+theme(axis.title.x = element_blank(), axis.title.y = element_blank()),
+          p3+theme(),
+          p5+theme(axis.title.y = element_blank()),
+          p4,
+          p6+theme(axis.title.y = element_blank()),
+          nrow = 3, ncol = 2,
+          align = "v", legend = "right", legend.grob = ggpubr::get_legend(p6+theme(legend.position = "right")))
+
+ggsave(filename = "abundancefull.tiff", device = "tiff", plot = p7, path = "./Figures",
+       dpi = 300, width = 16, height = 13, units = "in")
+```
+
+# Survey Comparison
+
+## Campelen
+
+### Fall
+
+```{r}
+load(file = "./ModelSaves/FallCamp_Length.RData")
+acc_surv <- read.csv("./Data/Capelin_AccSurv.csv")[1:2] %>% 
+  filter(Year > 1994) %>% rename(acsurv_bm = X3L.Spring..Acoustic.Capelin.Biomass..kt.)
+
+# Set up relationship data frame
+lr_dat <- data.frame(year = acc_surv[2:28,1], acc_bm = acc_surv[2:28,2], NLFPM_bm = rep$iye) #have to go y+1 
+
+# Linear relationship 
+fit <- lm(acc_bm~NLFPM_bm, data = lr_dat)
+cor.test(x = lr_dat$NLFPM_bm, y = lr_dat$acc_bm, method = "pearson") # p-values < 0.05: acoustic and NLFPM are significantly correlated 
+
+lr_dat <- na.omit(lr_dat)
+
+p8 <- ggplot(data = lr_dat, aes(x = NLFPM_bm, y = acc_bm)) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkgrey") +
+  geom_point(aes(colour = year), size = 1.5) +
+
+  scale_x_continuous(name = "NLFPM Abundance Index", expand = c(0.01,0)) +
+  scale_y_continuous(name = "3L Spring  Acoustic Capelin Biomass (kt)") +
+  scale_colour_gradient2(name = "Year", limits = c(1995,2020), midpoint = 2007,  low = "blue", mid = "#FFAEFF", high = "red") +
+  ggtitle("Campelen\na) Fall 2J3KL All Speices") +
+  theme_classic() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),   
+    legend.position = "none",
+    legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"),
+    axis.text =  element_text(size = 11), axis.title = element_text(size = 13, face = "bold"),
+    plot.title = element_text(size = 13, face = "bold"))
+
+```
+
+### Spring
+
+```{r}
+load(file = "./ModelSaves/AP-SprCamp_Length.RData")
+load(file = "./ModelSaves/GH-SprCamp_Length.RData")
+
+acc_surv <- read.csv("./Data/Capelin_AccSurv.csv")[1:2] %>% 
+  filter(Year > 1994) %>% rename(acsurv_bm = X3L.Spring..Acoustic.Capelin.Biomass..kt.)
+
+# Set up relationship data frame - ACAP
+ap_lr_dat <- data.frame(year = acc_surv[2:25,1], acc_bm = acc_surv[2:25,2], NLFPM_bm = ap_rep$iye)
+
+# This doesnt change corelation coefficient 
+ap_lr_dat <- data.frame(year = c(acc_surv[2:18,1], acc_surv[21:25,1]), acc_bm = c(acc_surv[2:18,2], acc_surv[21:25,2]), 
+                        NLFPM_bm = c(ap_rep$iye[2:18],ap_rep$iye[21:25]))
+
+# Linear relationship 
+fit <- lm(acc_bm~NLFPM_bm, data = ap_lr_dat) # thought is: can NLFPM predict acoustic survey accurately
+cor.test(x = ap_lr_dat$NLFPM_bm, y = ap_lr_dat$acc_bm, method = "pearson") # p-values < 0.05: acoustic and NLFPM are significantly correlated 
+
+ap_lr_dat <- na.omit(ap_lr_dat)
+
+p9 <- ggplot(data = ap_lr_dat, aes(x = NLFPM_bm, y = acc_bm)) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkgrey") +
+  geom_point(aes(colour = year), size = 1.5) +
+
+  scale_x_continuous(name = "NLFPM Abundance Index", expand = c(0.01,0)) +
+  scale_y_continuous(name = "3L Spring  Acoustic Capelin Biomass (kt)") +
+  scale_colour_gradient2(name = "Year", limits = c(1995,2020), midpoint = 2007,  low = "blue", mid = "#FFAEFF", high = "red") +
+  ggtitle(" \nb) Spring 3L Plaice") +
+  theme_classic() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),   
+    legend.position = 'none',
+    legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"),
+    axis.text =  element_text(size = 11), axis.title = element_text(size = 13, face = "bold"),
+    plot.title = element_text(size = 13, face = "bold"))
+
+
+# Set up relationship data frame - GH
+gh_lr_dat <- data.frame(year = acc_surv[2:25,1], acc_bm = acc_surv[2:25,2], NLFPM_bm = gh_rep$iye)
+
+# This does change the correlation coefficient
+gh_lr_dat <- data.frame(year = c(acc_surv[2:18,1], acc_surv[21:25,1]), acc_bm = c(acc_surv[2:18,2], acc_surv[21:25,2]), 
+                        NLFPM_bm = c(gh_rep$iye[2:18],gh_rep$iye[21:25]))
+
+
+# Linear relationship 
+fit <- lm(acc_bm~NLFPM_bm, data = gh_lr_dat) # thought is: can NLFPM predict acoustic survey accurately
+cor.test(x = gh_lr_dat$NLFPM_bm, y = gh_lr_dat$acc_bm, method = "pearson") # p-values < 0.05: acoustic and NLFPM are significantly correlated 
+
+gh_lr_dat <- na.omit(gh_lr_dat)
+
+p10 <- ggplot(data = gh_lr_dat, aes(x = NLFPM_bm, y = acc_bm)) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkgrey") +
+  geom_point(aes(colour = year), size = 1.5) +
+
+  scale_x_continuous(name = "NLFPM Abundance Index", expand = c(0.01,0)) +
+  scale_y_continuous(name = "3L Spring Acoustic Capelin Biomass (kt)") +
+  scale_colour_gradient2(name = "Year", limits = c(1995,2020), midpoint = 2007,  low = "blue", mid = "#FFAEFF", high = "red") +
+  theme_classic() +
+  ggtitle(" \nc) Spring 3L Halibut") +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),   
+        legend.position = 'none',
+        legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"),
+        axis.text =  element_text(size = 11), axis.title = element_text(size = 13, face = "bold"),
+    plot.title = element_text(size = 13, face = "bold"))
+
+```
+
+## Engel
+
+### Fall
+
+```{r}
+load(file = "./ModelSaves/ACAP-FallEng_Length.RData")
+load(file = "./ModelSaves/GH-FallEng_Length.RData")
+
+acc_surv <- read.csv("./Data/Capelin_AccSurv.csv")[1:2] %>% 
+  filter(Year > 1980 & Year < 1996) %>% rename(acsurv_bm = X3L.Spring..Acoustic.Capelin.Biomass..kt.) 
+
+# Set up relationship data frame - ACAP
+ac_lr_dat <- data.frame(year = acc_surv[2:15,1], acc_bm = acc_surv[2:15,2], NLFPM_bm = ac_rep$iye) #have to y+1
+
+# Linear relationship 
+fit <- lm(acc_bm~NLFPM_bm, data = ac_lr_dat) # thought is: can NLFPM predict acoustic survey accurately
+cor.test(x = ac_lr_dat$NLFPM_bm, y = ac_lr_dat$acc_bm, method = "pearson") # p-values < 0.05: acoustic and NLFPM are significantly correlated 
+
+ac_lr_dat <- na.omit(ac_lr_dat)
+
+p11 <- ggplot(data = ac_lr_dat, aes(x = NLFPM_bm, y = acc_bm)) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkgrey") +
+  geom_point(aes(colour = year), size = 1.5) +
+
+  scale_x_continuous(name = "NLFPM Abundance Index", expand = c(0.01,0)) +
+  scale_y_continuous(name = "3L Spring  Acoustic Capelin Biomass (kt)") +
+  scale_colour_gradient2(name = "Year", limits = c(1981,1995), midpoint = 1987,  low = "blue", mid = "#FFAEFF", high = "red") +
+  ggtitle("Engel\nd) Fall 2J3KL Cod/Plaice") +
+  theme_classic() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),   
+    legend.position = 'none',
+    legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"),
+    axis.text =  element_text(size = 11), axis.title = element_text(size = 13, face = "bold"),
+    plot.title = element_text(size = 13, face = "bold"))
+
+
+# Set up relationship data frame - GH
+gh_lr_dat <- data.frame(year = acc_surv[2:15,1], acc_bm = acc_surv[2:15,2], NLFPM_bm = gh_rep$iye)
+
+# Linear relationship 
+fit <- lm(acc_bm~NLFPM_bm, data = gh_lr_dat) # thought is: can NLFPM predict acoustic survey accurately
+cor.test(x = gh_lr_dat$NLFPM_bm, y = gh_lr_dat$acc_bm, method = "pearson") # p-values < 0.05: acoustic and NLFPM are significantly correlated 
+
+gh_lr_dat <- na.omit(gh_lr_dat)
+
+p12 <- ggplot(data = gh_lr_dat, aes(x = NLFPM_bm, y = acc_bm)) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkgrey") +
+  geom_point(aes(colour = year), size = 1.5) +
+
+  scale_x_continuous(name = "NLFPM Abundance Index", expand = c(0.01,0)) +
+  scale_y_continuous(name = "3L Spring Acoustic Capelin Biomass (kt)") +
+  scale_colour_gradient2(name = "Year", limits = c(1981,1995), midpoint = 1987,  low = "blue", mid = "#FFAEFF", high = "red") +
+  theme_classic() +
+  ggtitle(" \ne) Fall 2J3KL Halibut") +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),   
+    legend.position = 'none',
+    legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"),
+    axis.text =  element_text(size = 11), axis.title = element_text(size = 13, face = "bold"),
+    plot.title = element_text(size = 13, face = "bold"))
+
+```
+
+### Spring
+
+```{r}
+load(file = "./ModelSaves/ACAP-SprEng_Length.RData")
+load(file = "./ModelSaves/GH-SprEng_Length.RData")
+
+acc_surv <- read.csv("./Data/Capelin_AccSurv.csv")[1:2] %>% 
+  filter(Year > 1983 & Year < 1996) %>% rename(acsurv_bm = X3L.Spring..Acoustic.Capelin.Biomass..kt.)
+
+# Set up relationship data frame - ACAP
+ac_lr_dat <- data.frame(year = acc_surv[2:13,1], acc_bm = acc_surv[2:13,2], NLFPM_bm = c(ac_rep$iye[12], ac_rep$iye[1:11])) #have to y+1
+
+# Linear relationship 
+fit <- lm(acc_bm~NLFPM_bm, data = ac_lr_dat) # thought is: can NLFPM predict acoustic survey accurately
+cor.test(x = ac_lr_dat$NLFPM_bm, y = ac_lr_dat$acc_bm, method = "pearson") # p-values < 0.05: acoustic and NLFPM are significantly correlated 
+
+ac_lr_dat <- na.omit(ac_lr_dat)
+
+p13 <- ggplot(data = ac_lr_dat, aes(x = NLFPM_bm, y = acc_bm)) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkgrey") +
+  geom_point(aes(colour = year), size = 1.5) +
+
+  scale_x_continuous(name = "NLFPM Abundance Index", expand = c(0.01,0)) +
+  scale_y_continuous(name = "3L Spring  Acoustic Capelin Biomass (kt)") +
+  scale_colour_gradient2(name = "Year", limits = c(1984,1995), midpoint = 1990,  low = "blue", mid = "#FFAEFF", high = "red") +
+  ggtitle("\nf) Spring 2J3KL Cod/Plaice") +
+  theme_classic() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),   
+    legend.position = 'none',
+    legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"),
+    axis.text =  element_text(size = 11), axis.title = element_text(size = 13, face = "bold"),
+    plot.title = element_text(size = 13, face = "bold"))
+
+
+# Set up relationship data frame - GH
+gh_lr_dat <- data.frame(year = acc_surv[2:13,1], acc_bm = acc_surv[2:13,2], NLFPM_bm = c(gh_rep$iye[12], gh_rep$iye[1:11]))
+
+# Linear relationship 
+fit <- lm(acc_bm~NLFPM_bm, data = gh_lr_dat) # thought is: can NLFPM predict acoustic survey accurately
+cor.test(x = gh_lr_dat$NLFPM_bm, y = gh_lr_dat$acc_bm, method = "pearson") # p-values < 0.05: acoustic and NLFPM are significantly correlated 
+
+gh_lr_dat <- na.omit(gh_lr_dat)
+
+p14 <- ggplot(data = gh_lr_dat, aes(x = NLFPM_bm, y = acc_bm)) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkgrey") +
+  geom_point(aes(colour = year), size = 1.5) +
+
+  scale_x_continuous(name = "NLFPM Abundance Index", expand = c(0.01,0)) +
+  scale_y_continuous(name = "3L Spring Acoustic Capelin Biomass (kt)") +
+  scale_colour_gradient2(name = "Year", limits = c(1984,1995), midpoint = 1990,  low = "blue", mid = "#FFAEFF", high = "red") +
+  theme_classic() +
+  ggtitle(" \ng) Spring 2J3KL Halibut") +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),   
+    legend.position = 'none',
+    legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"),
+    axis.text =  element_text(size = 11), axis.title = element_text(size = 13, face = "bold"),
+    plot.title = element_text(size = 13, face = "bold"))
+```
+
+## - Figure 3
+
+```{r, fig.width=14, fig.height=8}
+p0 <- ggplot() +
+  geom_point(aes(x = 0, y = 0, colour = "white"), size = 1.5)+
+  scale_x_continuous(limits = c(0.1,1))+
+  theme_classic()
+
+p15 <- ggarrange(p8+theme(axis.title.x = element_blank()),
+          p9+theme(axis.title.x = element_blank(),axis.title.y = element_blank()),
+          p10+theme(axis.title.x = element_blank(),axis.title.y = element_blank()),
+          p0+theme(text = element_blank(), title = element_blank(), line = element_blank()),
+          nrow = 1, ncol = 4,
+          align = "v", legend = "right", common.legend = T)
+
+p16 <- ggarrange(p11,
+          p12+theme(axis.title.y = element_blank()),
+          p13+theme(axis.title.y = element_blank()),
+          p14+theme(axis.title.y = element_blank()),
+          nrow = 1, ncol = 4,
+          align = "hv", legend = "right", common.legend = T)
+
+p17 <- ggarrange(p15,p16,
+          nrow = 2, ncol = 1, align = "h")
+
+ggsave(filename = "survcomp.tiff", device = "tiff", plot = p17, path = "./Figures",
+       dpi = 300, width = 16, height = 8, units = "in")
+```
+
+# Spatial Comparison
+
+## Fall 2J3KL
+
+```{r}
+load(file = "./ModelSaves/FallCamp_Length.RData")
+
+# Set up relationship data frame
+lr_dat <- data.frame(year = unique(fishy_dat$year)[1:26], jkl_NLFPM_bm = rep$iye[1:26])
+
+load(file = "./ModelSaves/3LFallCamp_Length.RData")
+
+lr_dat$l_NLFPM_bm <- rep$iye
+
+# Linear relationship 
+fit <- lm(jkl_NLFPM_bm~l_NLFPM_bm, data = lr_dat)
+cor.test(x = lr_dat$jkl_NLFPM_bm, y = lr_dat$l_NLFPM_bm, method = "pearson") # p-values < 0.05: acoustic and NLFPM are significantly correlated
+
+car::influencePlot.lm(fit)
+
+```
+
+## - Figure 4
+
+```{r}
+p18 <- ggplot(data = lr_dat, aes(x = l_NLFPM_bm, y = jkl_NLFPM_bm)) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkgrey") +
+  geom_point(aes(colour = year), size = 1.5) +
+
+  scale_x_continuous(name = "3L NLFPM Abundance Index", expand = c(0.005,0)) +
+  scale_y_continuous(name = "2J3KL NLFPM Abundance Index", expand = c(0.01,0)) +
+  scale_colour_gradient2(name = "Year", limits = c(1995,2021), midpoint = 2007,  low = "blue", mid = "#FFAEFF", high = "red") +
+  theme_classic() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),   
+        legend.position = 'right', legend.direction = "vertical",
+        legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"),
+        axis.text =  element_text(size = 11), axis.title = element_text(size = 13, face = "bold"))
+
+ggsave(filename = "spatialcomp.tiff", device = "tiff", plot = p18, path = "./Figures",
+       dpi = 300, width = 5, height = 4.5, units = "in")
+```
