@@ -537,7 +537,7 @@ p13 <- ggplot(data = ac_lr_dat, aes(x = NLFPM_bm, y = acc_bm)) +
   scale_x_continuous(name = "NLFPM Abundance Index", expand = c(0.01,0)) +
   scale_y_continuous(name = "3L Spring  Acoustic Capelin Biomass (kt)") +
   scale_colour_gradient2(name = "Year", limits = c(1984,1995), midpoint = 1990,  low = "blue", mid = "#FFAEFF", high = "red") +
-  ggtitle("\nf) Spring 2J3KL Cod/Plaice") +
+  ggtitle("\nf) Spring 3L Cod/Plaice") +
   theme_classic() +
   theme(
     panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),   
@@ -564,7 +564,7 @@ p14 <- ggplot(data = gh_lr_dat, aes(x = NLFPM_bm, y = acc_bm)) +
   scale_y_continuous(name = "3L Spring Acoustic Capelin Biomass (kt)") +
   scale_colour_gradient2(name = "Year", limits = c(1984,1995), midpoint = 1990,  low = "blue", mid = "#FFAEFF", high = "red") +
   theme_classic() +
-  ggtitle(" \ng) Spring 2J3KL Halibut") +
+  ggtitle(" \ng) Spring 3L Halibut") +
   theme(
     panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),   
     legend.position = 'none',
@@ -600,46 +600,4 @@ p17 <- ggarrange(p15,p16,
 
 ggsave(filename = "survcomp.tiff", device = "tiff", plot = p17, path = "./Figures",
        dpi = 300, width = 16, height = 8, units = "in")
-```
-
-# Spatial Comparison
-
-## Fall 2J3KL
-
-```{r}
-load(file = "./ModelSaves/FallCamp_Length.RData")
-
-# Set up relationship data frame
-lr_dat <- data.frame(year = unique(fishy_dat$year)[1:26], jkl_NLFPM_bm = rep$iye[1:26])
-
-load(file = "./ModelSaves/3LFallCamp_Length.RData")
-
-lr_dat$l_NLFPM_bm <- rep$iye
-
-# Linear relationship 
-fit <- lm(jkl_NLFPM_bm~l_NLFPM_bm, data = lr_dat)
-cor.test(x = lr_dat$jkl_NLFPM_bm, y = lr_dat$l_NLFPM_bm, method = "pearson") # p-values < 0.05: acoustic and NLFPM are significantly correlated
-
-
-```
-
-## - Figure 4
-
-```{r}
-p18 <- ggplot(data = lr_dat, aes(x = l_NLFPM_bm, y = jkl_NLFPM_bm)) +
-  geom_smooth(method = "lm", se = TRUE, color = "darkgrey") +
-  geom_point(aes(colour = year), size = 1.5) +
-
-  scale_x_continuous(name = "3L NLFPM Abundance Index", expand = c(0.005,0)) +
-  scale_y_continuous(name = "2J3KL NLFPM Abundance Index", expand = c(0.01,0)) +
-  scale_colour_gradient2(name = "Year", limits = c(1995,2021), midpoint = 2007,  low = "blue", mid = "#FFAEFF", high = "red") +
-  theme_classic() +
-  theme(
-    panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),   
-        legend.position = 'right', legend.direction = "vertical",
-        legend.text = element_text(size = 9), legend.title = element_text(size = 11, face = "bold"),
-        axis.text =  element_text(size = 11), axis.title = element_text(size = 13, face = "bold"))
-
-ggsave(filename = "spatialcomp.tiff", device = "tiff", plot = p18, path = "./Figures",
-       dpi = 300, width = 5, height = 4.5, units = "in")
 ```
