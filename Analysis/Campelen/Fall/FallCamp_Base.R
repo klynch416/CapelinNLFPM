@@ -64,12 +64,6 @@ param_list <- list(
 )
 
 
-library(TMB)
-# dyn.unload("./TMBcode/SclNLFPM")
-# compile("./TMBcode/SclNLFPM.cpp")
-dyn.load("./TMBcode/SclNLFPM")
-
-
 map <- list(lscl = as.factor(c(rep(NA, length(param_list$lscl)))))
 
 obj <- MakeADFun(data = tmb_data, map=map,

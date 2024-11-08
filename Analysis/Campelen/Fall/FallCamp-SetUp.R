@@ -3,6 +3,10 @@ library(tidyverse)
 library(TMB)
 dyn.load("./TMBcode/SclNLFPM")
 
+# dyn.unload("./TMBcode/monoTempNLFPM")
+# compile("./TMBcode/monoTempNLFPM.cpp")
+dyn.load("./TMBcode/monoTempNLFPM")
+
 # load rstrap set data
 load(file = "./Data/setdet.rda") 
 setdet <- setdet %>% mutate(v.t.s = paste(vessel,trip,set, sep = ".")) %>% 
@@ -87,7 +91,7 @@ AP_stof <- stom_fall_good %>% filter(alt.name == "American plaice") %>% select(y
 # Set up different length bins
 ac1 <- AC_stof %>% filter(length > 17 & length <= 45)
 ac2 <- AC_stof %>% filter(length > 45) %>% filter(year != 1995)
-ap1 <- AP_stof %>% filter(length > 29) 
+ap1 <- AP_stof %>% filter(length > 29)
 gh1 <- GH_stof %>% filter(length > 19 & length <= 40)
 gh2 <- GH_stof %>% filter(length > 40)
 

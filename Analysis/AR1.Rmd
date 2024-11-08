@@ -1,0 +1,178 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r include=FALSE}
+library(tidyverse)
+library(glmmTMB)
+library(ggeffects)
+```
+
+# AR1
+
+## Campelen
+
+### Fall
+
+```{r}
+load(file = "./ModelSaves/FallCamp_Length.RData")
+acc_surv <- read.csv("./Data/Capelin_AccSurv.csv")[1:2] %>% 
+  filter(Year > 1994) %>% rename(acsurv_bm = X3L.Spring..Acoustic.Capelin.Biomass..kt.)
+
+lr_dat <- data.frame(year = as.factor(acc_surv[2:28,1]), acc_bm = acc_surv[2:28,2], NLFPM_bm = rep$iye, dummy = as.factor(0))
+
+fcar <- glmmTMB(scale(acc_bm) ~ NLFPM_bm + ar1(year+0|dummy), data = lr_dat)
+
+summary(fcar)
+
+
+plot(ggpredict(fcar, terms = c("NLFPM_bm")))+
+  geom_point(data = lr_dat, aes(x = NLFPM_bm, y = acc_bm))
+
+plot(lr_dat$acc_bm~lr_dat$NLFPM_bm)
+
+```
+Fall Campelen NLFPM correlation to acoustic - not significant positive relationship (Corr = 0.45, p = 0.0811)
+
+
+### Spring
+
+```{r}
+load(file = "./ModelSaves/AP-SprCamp_Length.RData")
+acc_surv <- read.csv("./Data/Capelin_AccSurv.csv")[1:2] %>% 
+  filter(Year > 1994) %>% rename(acsurv_bm = X3L.Spring..Acoustic.Capelin.Biomass..kt.)
+
+ap_lr_dat <- data.frame(year = as.factor(acc_surv[2:25,1]), acc_bm = acc_surv[2:25,2], NLFPM_bm = ap_rep$iye, dummy = as.factor(0))
+
+# # Influential points
+# ap_lr_dat <- data.frame(year = c(acc_surv[2:18,1], acc_surv[21:25,1]), acc_bm = c(acc_surv[2:18,2], acc_surv[21:25,2]), 
+#                         NLFPM_bm = c(ap_rep$iye[2:18],ap_rep$iye[21:25]))
+
+scapar <- glmmTMB(scale(acc_bm) ~ NLFPM_bm + ar1(year+0|dummy), data = ap_lr_dat)
+
+summary(scapar)
+
+
+plot(ggpredict(scapar, terms = c("NLFPM_bm")))+
+  geom_point(data = ap_lr_dat, aes(x = NLFPM_bm, y = acc_bm))
+
+plot(ap_lr_dat$acc_bm~ap_lr_dat$NLFPM_bm)
+
+```
+Spring Campelen AP NLFPM correlation to acoustic - not significant positive relationship (Corr = 0.54, p = 0.673)
+
+
+```{r}
+load(file = "./ModelSaves/GH-SprCamp_Length.RData")
+acc_surv <- read.csv("./Data/Capelin_AccSurv.csv")[1:2] %>% 
+  filter(Year > 1994) %>% rename(acsurv_bm = X3L.Spring..Acoustic.Capelin.Biomass..kt.)
+
+
+gh_lr_dat <- data.frame(year = as.factor(acc_surv[2:25,1]), acc_bm = acc_surv[2:25,2], NLFPM_bm = gh_rep$iye, dummy = as.factor(0))
+
+
+# gh_lr_dat <- data.frame(year = c(acc_surv[2:18,1], acc_surv[21:25,1]), acc_bm = c(acc_surv[2:18,2], acc_surv[21:25,2]), 
+#                         NLFPM_bm = c(gh_rep$iye[2:18],gh_rep$iye[21:25]))
+
+scghar <- glmmTMB(scale(acc_bm) ~ NLFPM_bm + ar1(year+0|dummy), data = gh_lr_dat)
+
+summary(scghar)
+
+
+plot(ggpredict(scghar, terms = c("NLFPM_bm")))+
+  geom_point(data = gh_lr_dat, aes(x = NLFPM_bm, y = acc_bm))
+
+plot(gh_lr_dat$acc_bm~gh_lr_dat$NLFPM_bm)
+
+```
+Spring Campelen GH NLFPM correlation to acoustic - No convergence
+
+## Engel
+
+### Fall
+```{r}
+load(file = "./ModelSaves/ACAP-FallEng_Length.RData")
+acc_surv <- read.csv("./Data/Capelin_AccSurv.csv")[1:2] %>% 
+  filter(Year > 1980 & Year < 1996) %>% rename(acsurv_bm = X3L.Spring..Acoustic.Capelin.Biomass..kt.) 
+
+# Set up relationship data frame - ACAP
+ac_lr_dat <- data.frame(year = as.factor(acc_surv[2:15,1]), acc_bm = acc_surv[2:15,2], NLFPM_bm = ac_rep$iye, dummy = as.factor(0)) #have to y+1
+
+feacar <- glmmTMB(scale(acc_bm) ~ NLFPM_bm + ar1(year+0|dummy), data = ac_lr_dat)
+
+summary(feacar)
+
+
+plot(ggpredict(feacar, terms = c("NLFPM_bm")))+
+  geom_point(data = ac_lr_dat, aes(x = NLFPM_bm, y = acc_bm))
+
+plot(ac_lr_dat$acc_bm~ac_lr_dat$NLFPM_bm)
+
+```
+Fall Engel ACAP NLFPM correlation to acoustic - significant positive relationship (Corr = 0.02, p = 0.0376)
+
+```{r}
+load(file = "./ModelSaves/GH-FallEng_Length.RData")
+acc_surv <- read.csv("./Data/Capelin_AccSurv.csv")[1:2] %>% 
+  filter(Year > 1980 & Year < 1996) %>% rename(acsurv_bm = X3L.Spring..Acoustic.Capelin.Biomass..kt.) 
+
+gh_lr_dat <- data.frame(year = as.factor(acc_surv[2:15,1]), acc_bm = acc_surv[2:15,2], NLFPM_bm = gh_rep$iye, dummy = as.factor(0))
+
+feghar <- glmmTMB(scale(acc_bm) ~ NLFPM_bm + ar1(year+0|dummy), data = gh_lr_dat)
+
+summary(feghar)
+
+
+plot(ggpredict(feghar, terms = c("NLFPM_bm")))+
+  geom_point(data = gh_lr_dat, aes(x = NLFPM_bm, y = acc_bm))
+
+plot(gh_lr_dat$acc_bm~gh_lr_dat$NLFPM_bm)
+
+```
+Fall Engel GH NLFPM correlation to acoustic - No converge
+
+### Spring
+
+```{r}
+load(file = "./ModelSaves/ACAP-SprEng_Length.RData")
+acc_surv <- read.csv("./Data/Capelin_AccSurv.csv")[1:2] %>% 
+  filter(Year > 1983 & Year < 1996) %>% rename(acsurv_bm = X3L.Spring..Acoustic.Capelin.Biomass..kt.)
+
+ac_lr_dat <- data.frame(year = as.factor(acc_surv[2:13,1]), acc_bm = acc_surv[2:13,2], NLFPM_bm = c(ac_rep$iye[12], ac_rep$iye[1:11]), dummy = as.factor(0)) #have to y+1
+
+seacar <- glmmTMB(scale(acc_bm) ~ NLFPM_bm + ar1(year+0|dummy), data = ac_lr_dat)
+
+summary(seacar)
+
+
+plot(ggpredict(seacar, terms = c("NLFPM_bm")))+
+  geom_point(data = ac_lr_dat, aes(x = NLFPM_bm, y = acc_bm))
+
+plot(ac_lr_dat$acc_bm~ac_lr_dat$NLFPM_bm)
+
+```
+Spring Engel ACAP NLFPM correlation to acoustic - no significant correlation (Corr = 0.03, p = 0.6177)
+
+```{r}
+load(file = "./ModelSaves/GH-SprEng_Length.RData")
+acc_surv <- read.csv("./Data/Capelin_AccSurv.csv")[1:2] %>% 
+  filter(Year > 1983 & Year < 1996) %>% rename(acsurv_bm = X3L.Spring..Acoustic.Capelin.Biomass..kt.)
+
+gh_lr_dat <- data.frame(year = as.factor(acc_surv[2:13,1]), acc_bm = acc_surv[2:13,2], NLFPM_bm = c(gh_rep$iye[12], gh_rep$iye[1:11]), dummy = as.factor(0))
+
+seghar <- glmmTMB(scale(acc_bm) ~ NLFPM_bm + ar1(year+0|dummy), data = gh_lr_dat)
+
+summary(seghar)
+
+
+plot(ggpredict(seghar, terms = c("NLFPM_bm")))+
+  geom_point(data = gh_lr_dat, aes(x = NLFPM_bm, y = acc_bm))
+
+plot(gh_lr_dat$acc_bm~gh_lr_dat$NLFPM_bm)
+
+```
+Spring Engel ACAP NLFPM correlation to acoustic - no significant correlation (Corr = 0.09, p = 0.907)
+

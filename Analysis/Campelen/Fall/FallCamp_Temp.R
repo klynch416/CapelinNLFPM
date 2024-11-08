@@ -64,12 +64,6 @@ param_list <- list(
 )
 
 
-library(TMB)
-# dyn.unload("./TMBcode/SclNLFPM")
-# compile("./TMBcode/SclNLFPM.cpp")
-dyn.load("./TMBcode/SclNLFPM")
-
-
 obj <- MakeADFun(data = tmb_data,
                  parameters = param_list,
                  DLL = "SclNLFPM", 
