@@ -1,91 +1,56 @@
-# Set up data
-source("./Analysis/Engel/Fall/FallEng-SetUp.R")
+# Set up environment
+library(tidyverse)
+library(TMB)
 
-# Set up model env
-n <- c(length(trawlf$year),
-       length(ac1$year),length(ac2$year),
-       length(ap1$year))
-pa <- c(trawlf$pa, 
-        ac1$pa, ac2$pa, 
-        ap1$pa)
-year <- c(trawlf$year, 
-          ac1$year, ac2$year,
-          ap1$year)
-names <- c("Trawl", "ac1","ac2", "ap1")
-id <- c(seq(0,(length(names)-1)))
+# Load functions
+source("./Functions/make_data.R")
+source("./Functions/model_data.R")
+source("./Functions/model_param.R")
+
+# Load TMB models
+dyn.load("./TMBcode/SclNLFPM")
+dyn.load("./TMBcode/SppmonoTempNLFPM")
 
 
-sd_temp <- c(sd(trawlf$bot.temp),
-             sd(ac1$bot.temp),sd(ac2$bot.temp),
-             sd(ap1$bot.temp))
-topt <- c(median(trawlf$bot.temp), 
-          median(ac1$bot.temp), median(ac2$bot.temp),  
-          median(ap1$bot.temp))
-temp <- c(trawlf$bot.temp, 
-          ac1$bot.temp, ac2$bot.temp,
-          ap1$bot.temp)
+# Set up data for model
+load(file = "./ModelSaves/Set_Up/FE-1994.RData")
 
-
-spp_n <- c(length(trawlf$year), 
-           sum(length(ac1$year),length(ac2$year)), 
-           sum(length(ap1$year)))
-spp_id <- c(0,1,2)
-
-
-
-model <- 0
-
-ac_fishy_dat <- data.frame(pa = pa, 
-                        year = year, 
-                        names = rep(names, n),
-                        idmod = rep(model, sum(n)),
-                        idex = rep(id, n),
-                        temp = temp,
-                        isd_temp = rep(sd_temp, n),
-                        itopt = rep(topt, n))
-
-omega <- data.frame(species = ac_fishy_dat$names, value = rep(NA, length(ac_fishy_dat$pa)))
-for(i in 1:length(ac_fishy_dat$pa)){
-  omega[i,2] = (1/(ac_fishy_dat$isd_temp[i]*sqrt(2*pi)))*exp((-0.5)*((ac_fishy_dat$temp[i]-ac_fishy_dat$itopt[i])/ac_fishy_dat$isd_temp[i])^2)
-}
-omega <- omega %>% group_by(species) %>% mutate(min = min(value), max = max(value))
-
-ac_tmb_data <- list(n = length(ac_fishy_dat$pa),
-                 nyrs = length(unique(ac_fishy_dat$year)),
-                 iyear = ac_fishy_dat$year - min(ac_fishy_dat$year),
-                 k = 1,
-                 pa = ac_fishy_dat$pa,
-                 idmod = ac_fishy_dat$idmod,
-                 ndex = length(unique(ac_fishy_dat$idex)),
-                 idex = ac_fishy_dat$idex,
-                 omega = omega$value,
-                 Omin = unique(omega$min)[2:length(n)],
-                 Omax = unique(omega$max)[2:length(n)]
-)
-
-ac_param_list <- list(
-  iye = seq(from = log(10), to = log(20), length.out = ac_tmb_data$nyrs),
-  logrw_var = log(1),
-  lchi = c(rep(log(0.5), (length(n)-1))),
-  lbeta = c(rep(log(0.5), (length(n)-1))),
-  lscl = c(rep(log(0.75), (length(n)-1)))
+ac_fishy_dat <- make_data(n = c(length(trawlf$year),
+                                length(ac1$year),length(ac2$year),
+                                length(ap1$year)),
+                          pa = c(trawlf$pa, 
+                                 ac1$pa, ac2$pa, 
+                                 ap1$pa), 
+                          year = c(trawlf$year, 
+                                   ac1$year, ac2$year,
+                                   ap1$year), 
+                          names = c("Trawl", "ac1","ac2", "ap1"),
+                          tempType = "noTemp",
+                          onto = T
 )
 
 
 
 
+# Set up data to be passed into TMB
+ac_tmb_data <- model_data(fishy_dat = ac_fishy_dat, modType = "nonlinear", tempType = "noTemp", n = n)
 
-map <- list(lscl = as.factor(c(rep(NA, length(ac_param_list$lscl)))))
 
-obj <- MakeADFun(data = ac_tmb_data, map=map,
-                 parameters = ac_param_list,
+
+# Set up parameters estimated by TMB
+ac_tmb_params <- model_param(tmb_data = ac_tmb_data, lbeta = log(0.5), lchi = log(0.5))
+
+
+
+# Run model
+obj <- MakeADFun(data = ac_tmb_data,
+                 parameters = ac_tmb_params,
                  DLL = "SclNLFPM", 
                  random = c("iye"))
 
 opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 10, eval.max = 2000, iter.max = 1000), silent = TRUE)
 
-
+# Save model outputs
 ac_rep <- obj$report()
 ac_sdrep <- sdreport(obj)
-# ac_sdrep
-# 2*opt$objective + 2*length(opt$par)
+ac_sdrep
