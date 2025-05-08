@@ -1,9 +1,71 @@
-# Chap1
+# Comparing capelin abundance estimates from predator diet data and an acoustic survey
 
-Comparing Capelin Abundance Estimates from Predator Diet Data and an Acoustic Survey
+# Citation
+Lynch, K.E. 2025. Comparing capelin abundance estimates from predator diet data and an acoustic survey: Zenodo code release. DOI: .
 
-Lynch, K.1, Koen-Alonso, M.2 & Robertson, M.D.1
-1.	Centre for Fisheries Ecosystems Research, Fisheries and Marine Institute of Memorial University of Newfoundland, P.O. Box 4920, St. John’s, NL, A1C 5R3, Canada.
-2.	Fisheries and Oceans Canada, Northwest Atlantic Fisheries Centre, P.O. Box 5667, 80 East White Hills Rd., St. John’s, NL, A1C 5X1, Canada.
+# Contact
 
-In Newfoundland and Labrador, capelin (Mallotus villosus) is a critical link between zooplankton and larger vertebrates to move energy up the food web. This role in energy transfer makes capelin an integral species for effective regional fisheries management. However, the population of capelin off the east coast of Newfoundland collapsed in 1990-1991, with limited recovery since. Current understanding of capelin abundance is primarily based on a hydroacoustic survey index. This survey is conducted in the spring and is designed to cover the core of the spring distribution. However, the spring survey only covers a portion of the stock area and abundance estimates are regarded as minimum estimates. We sought to gain a better understanding of capelin abundance trends through time and add to the existing range of methodologies used in their assessment. To achieve this goal, we modified a recently developed state-space model, that estimates prey abundance from bottom-trawl research survey and predator stomach contents data, to examine the benefit of accounting for temperature-induced and ontogenetic diet shifts. We used this model to estimate capelin abundance separately for spring and fall surveys and from two bottom-trawl gears with different catchability assumptions. We found the best performing model used an ontogenetic, but not temperature, diet shift to account for changes in predator selectivity. There was inconsistent agreement between our estimates of capelin abundance and estimates from the spring acoustic survey depending on survey season and the bottom-trawl gear. Furthermore, model estimates from a spatially restricted dataset, representing the spatial coverage of the acoustic survey, did not align with estimates from a model with data across the entire stock range. These results point to a need for including the entire population range in capelin stock assessment.
+Author - [Kerri E. Lynch](Kerri.Lynch@mi.mun.ca), Marine Institute of Memorial University. 
+
+# Summary
+
+This code accompanies Lynch et al. (Submitted) where 
+
+# Code purpose and order
+
+This code is intended to allow readers/reviewers the ability to repeat analyses in the paper.
+
+1. The first script to run is `[...]-SetUp.R`. This script will load csv files containing trawl catch data and predator stomach content data, 
+\n and then prepare them following methods described in detail from Lynch et al. (Submitted) to be used in the NLFPM. Due to data availability
+\n limitations, example data cannot be shared.
+
+2. The second script is `[...]_Length.R`. This script will format the data from `[...]-SetUp.R` to be used in `SclNLFPM.cpp` to estimate 
+\n parameters related to the functional response, which will be used to estimate an abundance index. This script will also run the model.
+
+# File descriptions
+
+`Analysis/` - Folder housing Rscripts used to set up and run models for different geartypes (Campelen, Engel) and seasons (fall, spring)
+
+* `Campelen/`
+    + `Fall/`
+      - `FallCamp-SetUp.R` - R script for loading fall Campelen data for modelling
+      - `FallCamp-Base.R` - R script for running fall Campelen data with the Base NLFPM
+      - `FallCamp-Length.R` - R script for running fall Campelen data with the Length NLFPM (ontogentic effect)
+      - `FallCamp-monoTemp.R` - R script for running fall Campelen data with the monoTemp NLFPM (temperature effect)
+      - `FallCamp-monoTempLength.R` - R script for running fall Campelen data with the monoTempLength NLFPM (temperature and ontogentic effect)
+      - `FallCamp-Temp.R` - R script for running fall Campelen data with the Temp NLFPM (temperature effect)
+      - `FallCamp-TempLength.R` - R script for running fall Campelen data with the TempLength NLFPM (temperature and ontogentic effect)
+    + `Spring/`
+      - `SprCamp-SetUp.R` - R script for loading spring Campelen data for modelling
+      - `ACAP-SprCamp_Base.R` - R script for running Atlantic cod and American plaice spring Campelen data with the Base NLFPM
+      - `GH-SprCamp_Base.R` - R script for running Greenland halibut spring Campelen data with the Base NLFPM
+* `Engel/`
+    + `Fall/`
+      - `FallEng-SetUp.R` - R script for loading fall Engel data for modelling 
+      - `ACAP-FallEng_Length.R` - R script for running fall Engel data with the Length NLFPM
+      - `GH-FallEng_Length.R` - R script for running fall Engel data with the Length NLFPM
+    + `Spring`
+      - `SprEng-SetUp.R` - R script for loading spring Engel data for modelling
+      - `SprEng_Length.R` - R script for running spring Engel data with the Length NLFPM
+
+`TMBcode/` - Folder containing C++ code for running models 
+
+* `SclNLFPM.cpp` - C++ file containing the Base, Length, and Temp models and likelihood functions implemented by the TMB package
+* `SclNLFPM.dll` - Dynamic link library for the compiled `SclNLFPM.cpp` file
+* `SclNLFPM.o` - Object file for the compiled `SclNLFPM.cpp` file
+
+* `SppmonoTempNLFPM.cpp` - C++ file containing the monoTemp and monoTempLength models and likelihood functions implemented by the TMB package
+* `SppmonoTempNLFPM.dll` - Dynamic link library for the compiled `SppmonoTempNLFPM.cpp` file
+* `SppmonoTempNLFPM.o` - Object file for the compiled `SppmonoTempNLFPM.cpp` file
+
+
+`Chap1.Rproj` - R project file housing the code and data within this repository
+
+`PaperSections.Rmd` - R markdown aggregating code used for analysis in publication
+
+`README.md` - README file formatted for Github
+
+`SuppSections.Rmd` - R markdown aggregating code used for supplemental material accompanying the publication
+
+
+
