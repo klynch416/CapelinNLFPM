@@ -1,56 +1,49 @@
-# Set up data
-source("./Analysis/Campelen/Fall/FallCamp-SetUp.R")
+# Set up environment
+library(tidyverse)
+library(TMB)
+
+# Load functions
+source("./Functions/make_data.R")
+source("./Functions/model_data.R")
+source("./Functions/model_param.R")
+
+# Load TMB models
+dyn.load("./TMBcode/SclNLFPM")
+dyn.load("./TMBcode/SppmonoTempNLFPM")
 
 
+# Set up data for model
+load(file = "./ModelSaves/Set_Up/FC-2020.RData")
 
-model <- 5
-
-fishy_dat <- data.frame(pa = pa, 
-                        year = year, 
-                        names = rep(names, n),
-                        idmod = rep(model, sum(n)),
-                        idex = rep(id, n),
-                        temp = temp,
-                        isd_temp = rep(sd_temp, n),
-                        itopt = rep(topt, n))
-
-omega <- data.frame(species = fishy_dat$names, value = rep(NA, length(fishy_dat$pa)))
-for(i in 1:length(fishy_dat$pa)){
-  omega[i,2] = (1/(fishy_dat$isd_temp[i]*sqrt(2*pi)))*exp((-0.5)*((fishy_dat$temp[i]-fishy_dat$itopt[i])/fishy_dat$isd_temp[i])^2)
-}
-omega <- omega %>% group_by(species) %>% mutate(min = min(value), max = max(value))
-
-tmb_data <- list(n = length(fishy_dat$pa),
-                 nyrs = length(unique(fishy_dat$year)),
-                 iyear = fishy_dat$year - min(fishy_dat$year),
-                 k = 1,
-                 pa = fishy_dat$pa,
-                 idmod = fishy_dat$idmod,
-                 ndex = length(unique(fishy_dat$idex)),
-                 idex = fishy_dat$idex,
-                 omega = omega$value,
-                 Omin = unique(omega$min)[2:length(n)],
-                 Omax = unique(omega$max)[2:length(n)]
-)
-
-param_list <- list(
-  iye = seq(from = log(10), to = log(20), length.out = tmb_data$nyrs),
-  logrw_var = log(1),
-  lchi = c(rep(log(0.5), (length(n)-1))),
-  lbeta = c(rep(log(0.5), (length(n)-1))),
-  lscl = c(rep(log(0.75), (length(n)-1)))
+fishy_dat <- make_data(n = n,
+                       pa = pa, 
+                       year = year, 
+                       names = names,
+                       tempType = "scaledTemp",
+                       onto = T,
+                       temp = temp
 )
 
 
 
+
+# Set up data to be passed into TMB
+tmb_data <-  model_data(fishy_dat = fishy_dat, modType = "nonlinear", tempType = "scaledTemp", n = n)
+
+
+# Set up parameters estimated by TMB
+tmb_params <- model_param(tmb_data = tmb_data, lbeta = log(0.5), lchi = log(0.5), lscl = log(0.75))
+
+
+# Run model
 obj <- MakeADFun(data = tmb_data,
-                 parameters = param_list,
+                 parameters = tmb_params,
                  DLL = "SclNLFPM", 
                  random = c("iye"))
 
 opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 10, eval.max = 2000, iter.max = 1000), silent = TRUE)
 
-
+# Save model outputs
 rep <- obj$report()
 sdrep <- sdreport(obj)
 sdrep

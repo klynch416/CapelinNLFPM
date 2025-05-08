@@ -30,7 +30,9 @@ fishy_dat <- make_data(n = c(length(trawlf$year),
                                 c(ap1$year)), 
                        names = c("Trawl", "Atlantic cod", "Greenland halibut", "American plaice"), 
                        onto = F,
-                       tempType = "scaledTemp",
+                       tempType = "monoTemp",
+                       spp_id = spp_id,
+                       spp_n = spp_n,
                        temp = c(trawlf$bot.temp, 
                                 c(ac1$bot.temp, ac2$bot.temp),
                                 c(gh1$bot.temp, gh2$bot.temp),
@@ -39,9 +41,8 @@ fishy_dat <- make_data(n = c(length(trawlf$year),
 
 
 
-
 # Set up data to be passed into TMB
-tmb_data <- model_data(fishy_dat = fishy_dat, modType = "nonlinear", tempType = "scaledTemp",
+tmb_data <- model_data(fishy_dat = fishy_dat, modType = "nonlinear", tempType = "monoTemp",
                        n = c(length(trawlf$year), 
                              length(c(ac1$year, ac2$year)), 
                              length(c(gh1$year, gh2$year)), 
@@ -51,13 +52,13 @@ tmb_data <- model_data(fishy_dat = fishy_dat, modType = "nonlinear", tempType = 
 
 
 # Set up parameters estimated by TMB
-tmb_params <- model_param(tmb_data = tmb_data, lbeta = log(0.5), lchi = log(0.5), lscl = log(0.75))
+tmb_params <- model_param(tmb_data = tmb_data, lbeta = log(0.5), lchi = log(0.5), lmink = log(1), lmidp = log(15))
 
 
 # Run model
 obj <- MakeADFun(data = tmb_data,
                  parameters = tmb_params,
-                 DLL = "SclNLFPM", 
+                 DLL = "SppmonoTempNLFPM", 
                  random = c("iye"))
 
 opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 10, eval.max = 2000, iter.max = 1000), silent = TRUE)
@@ -67,4 +68,3 @@ rep <- obj$report()
 sdrep <- sdreport(obj)
 sdrep
 2*opt$objective + 2*length(opt$par)
-
