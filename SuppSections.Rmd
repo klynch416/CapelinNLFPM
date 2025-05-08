@@ -1,0 +1,1506 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+# Setup Env
+
+```{r include=FALSE}
+library(tidyverse)
+library(cowplot)
+library(ggpubr)
+library(glmmTMB)
+```
+
+# Data removed maps
+
+## Engel
+
+### Spring
+
+```{r}
+source("./Analysis/Engel/Spring/SprEng-SetUp.R")
+
+capelin_catch_raster <- terra::as.data.frame(mean_catch, xy = TRUE)
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+capelin_catch_raster <- capelin_catch_raster %>%  mutate(color_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+pMSE <- ggplot() +
+  geom_tile(data = filter(capelin_catch_raster, color_category == "Zero"), aes(x = x, y = y), fill = "grey80") +
+  geom_tile(data = filter(capelin_catch_raster, color_category == "Non-Zero"), aes(x = x, y = y, fill = pa)) +
+  
+  scale_x_continuous(name = "Longitude", limits = c(-59, -45), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
+  scale_y_continuous(name = "Latitude", limits = c(45, 56), breaks = c(seq(46, 56, 4)), expand = c(0,0)) +
+  scale_fill_viridis_c(name = "Proportion of \ncapelin catches", limits = c(0,1)) +
+  ggtitle("Engel\na) 3L Spring ") +
+  
+  theme_minimal() +
+  theme(legend.position = "none", title = element_text(size = 15, face = "bold"),
+        axis.title.x = element_blank(), axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"))
+
+```
+
+### Fall
+
+```{r}
+
+source("./Analysis/Engel/Fall/FallEng-SetUp.R")
+
+capelin_catch_raster <- terra::as.data.frame(mean_catch, xy = TRUE)
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+capelin_catch_raster <- capelin_catch_raster %>%  mutate(color_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+pMFE <- ggplot() +
+  geom_tile(data = filter(capelin_catch_raster, color_category == "Zero"), aes(x = x, y = y), fill = "grey80") +
+  geom_tile(data = filter(capelin_catch_raster, color_category == "Non-Zero"), aes(x = x, y = y, fill = pa)) +
+  
+  scale_x_continuous(name = "Longitude", limits = c(-59, -45), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
+  scale_y_continuous(name = "Latitude", limits = c(45, 56), breaks = c(seq(46, 56, 4)), expand = c(0,0)) +
+  scale_fill_viridis_c(name = "Proportion of \ncapelin catches", limits = c(0,1)) +
+  
+  ggtitle("c) 2J3KL Fall") +
+  theme_minimal() +
+  theme(legend.position = "none", title = element_text(size = 15, face = "bold"),
+        
+        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"))
+
+```
+
+## Campelen
+
+### Spring
+
+```{r}
+source("./Analysis/Campelen/Spring/SprCamp-SetUp.R")
+
+capelin_catch_raster <- terra::as.data.frame(mean_catch, xy = TRUE)
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+capelin_catch_raster <- capelin_catch_raster %>%  mutate(color_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+pMSC <- ggplot() +
+  geom_tile(data = filter(capelin_catch_raster, color_category == "Zero"), aes(x = x, y = y), fill = "grey80") +
+  geom_tile(data = filter(capelin_catch_raster, color_category == "Non-Zero"), aes(x = x, y = y, fill = pa)) +
+
+  scale_x_continuous(name = "Longitude", limits = c(-59, -45), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
+  scale_y_continuous(name = "Latitude", limits = c(45, 56), breaks = c(seq(46, 56, 4)), expand = c(0,0)) +
+  scale_fill_viridis_c(name = "Proportion of \ncapelin catches", limits = c(0,1)) +
+  
+  ggtitle("Campelen\nb) 3L Spring") + 
+
+  theme_minimal() +
+  theme(legend.position = "none", title = element_text(size = 15, face = "bold"),
+        axis.title.x = element_blank(), axis.title.y = element_blank(),
+        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"))
+
+```
+
+### Fall
+
+```{r, fig.width=5, fig.height=6}
+
+source("./Analysis/Campelen/Fall/FallCamp-SetUp.R")
+
+capelin_catch_raster <- terra::as.data.frame(mean_catch, xy = TRUE)
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+capelin_catch_raster <- capelin_catch_raster %>%  mutate(color_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+pMFC <- ggplot() +
+  geom_tile(data = filter(capelin_catch_raster, color_category == "Zero"), aes(x = x, y = y), fill = "grey80") +
+  geom_tile(data = filter(capelin_catch_raster, color_category == "Non-Zero"), aes(x = x, y = y, fill = pa)) +
+  
+  scale_x_continuous(name = "Longitude", limits = c(-59, -45), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
+  scale_y_continuous(name = "Latitude", limits = c(45, 56), breaks = c(seq(46, 56, 4)), expand = c(0,0)) +
+  scale_fill_viridis_c(name = "Proportion of \ncapelin catches", limits = c(0,1)) +
+  
+  ggtitle("d) 2J3KL Fall") + 
+
+  theme_minimal() +
+  theme(legend.position = "none", title = element_text(size = 15, face = "bold"),
+        axis.title.y = element_blank(), axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"))
+
+
+```
+
+## - Figure 1
+```{r, fig.width=10, fig.height=10}
+
+pmaps <- ggpubr::ggarrange(pMSE,
+                           pMSC,
+                           pMFE,
+                           pMFC,
+                           nrow = 2, ncol = 2,
+                           align = "v", common.legend = TRUE,
+                           legend = "right", legend.grob = ggpubr::get_legend(pMSC+theme(legend.position = "right"))
+)
+
+ggsave(filename = "datamaps.tiff", device = "tiff", plot = pmaps, path = "./Figures",
+       dpi = 300, width = 10, height = 10, units = "in")
+
+```
+
+# Sample size
+
+## Engel
+
+### Spring
+```{r}
+load(file = "./ModelSaves/Set_Up/SE-1995.RData")
+
+acs1 <- AC_stos %>% filter(length > 17 & length <= 45)
+acs2 <- AC_stos %>% filter(length > 45)
+aps1 <- AP_stos %>% filter(length > 29)
+ghs1 <- GH_stos %>% filter(length > 19 & length <= 40)
+ghs2 <- GH_stos %>% filter(length > 40)
+
+acs0 <- AC_stos %>% filter(length < 18)
+aps0 <- AP_stos %>% filter(length < 30)
+ghs0 <- GH_stos %>% filter(length < 20)
+
+
+# table(acs0$pa, acs0$year)
+# table(acs1$pa, acs1$year)
+# table(acs2$pa, acs2$year)
+# table(aps0$pa, aps0$year)
+# table(aps1$pa, aps1$year)
+# table(ghs0$pa, ghs0$year)
+# table(ghs1$pa, ghs1$year)
+# table(ghs2$pa, ghs2$year)
+
+Eacs1 <- AC_stos %>% filter(length > 17 & length <= 45) %>% filter(year != 1995)
+Eacs2 <- AC_stos %>% filter(length > 45) %>% filter(year != 1995)
+Eaps1 <- AP_stos %>% filter(length > 29)
+Eghs1 <- GH_stos %>% filter(length > 19 & length <= 40)
+Eghs2 <- GH_stos %>% filter(length > 40)
+
+Eacs0 <- AC_stos %>% filter(length < 18) %>% filter(year == 1982)
+Eaps0 <- AP_stos %>% filter(length < 30) %>% filter(year != 1984)
+Eghs0 <- GH_stos %>% filter(length < 20) %>% filter(year != 1984)
+
+```
+
+### Fall
+```{r}
+load(file = "./ModelSaves/Set_Up/FE-1994.RData")
+
+acf1 <- AC_stof %>% filter(length > 17 & length <= 45)
+acf2 <- AC_stof %>% filter(length > 45)
+apf1 <- AP_stof %>% filter(length > 29)
+ghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
+ghf2 <- GH_stof %>% filter(length > 40)
+
+acf0 <- AC_stof %>% filter(length < 18)
+apf0 <- AP_stof %>% filter(length < 30)
+ghf0 <- GH_stof %>% filter(length < 20)
+
+# table(acf0$pa, acf0$year)
+# table(acf1$pa, acf1$year)
+# table(acf2$pa, acf2$year)
+# table(apf0$pa, apf0$year)
+# table(apf1$pa, apf1$year)
+# table(ghf0$pa, ghf0$year)
+# table(ghf1$pa, ghf1$year)
+# table(ghf2$pa, ghf2$year)
+
+Eacf1 <- AC_stof %>% filter(length > 17 & length <= 45)
+Eacf2 <- AC_stof %>% filter(length > 45) %>% filter(year != 1994)
+Eapf1 <- AP_stof %>% filter(length > 29)
+Eghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
+Eghf2 <- GH_stof %>% filter(length > 40)
+
+Eacf0 <- AC_stof %>% filter(length < 18) %>% filter(year == 1982 & year == 1983 & year == 1988)
+Eapf0 <- AP_stof %>% filter(length < 30)
+Eghf0 <- GH_stof %>% filter(length < 20)
+
+```
+
+### Total
+```{r}
+Eac0 <- rbind(acs0, acf0) %>% mutate(alt.name = "Atlantic cod")
+Eac1 <- rbind(acs1, acf1) %>% mutate(alt.name = "Atlantic cod")
+Eac2 <- rbind(acs2, acf2) %>% mutate(alt.name = "Atlantic cod")
+Eap0 <- rbind(aps0, apf0) %>% mutate(alt.name = "American plaice")
+Eap1 <- rbind(aps1, apf1) %>% mutate(alt.name = "American plaice")
+Egh0 <- rbind(ghs0, ghf0) %>% mutate(alt.name = "Greenland halibut")
+Egh1 <- rbind(ghs1, ghf1) %>% mutate(alt.name = "Greenland halibut")
+Egh2 <- rbind(ghs2, ghf2) %>% mutate(alt.name = "Greenland halibut")
+
+# table(Eac0$year, Eac0$season)
+# table(Eac1$year, Eac1$season)
+# table(Eac2$year, Eac2$season)
+# table(Egh0$year, Egh0$season)
+# table(Egh1$year, Egh1$season)
+# table(Egh2$year, Egh2$season)
+# table(Eap0$year, Eap0$season)
+# table(Eap1$year, Eap1$season)
+
+```
+
+
+## Campelen
+
+### Spring
+```{r}
+load(file = "./ModelSaves/Set_Up/SC-2019.RData")
+
+
+acs1 <- AC_stos %>% filter(length > 17 & length <= 45)
+acs2 <- AC_stos %>% filter(length > 45)
+aps1 <- AP_stos %>% filter(length > 29)
+ghs1 <- GH_stos %>% filter(length > 19 & length <= 40)
+ghs2 <- GH_stos %>% filter(length > 40)
+
+acs0 <- AC_stos %>% filter(length < 18)
+aps0 <- AP_stos %>% filter(length < 30)
+ghs0 <- GH_stos %>% filter(length < 20)
+
+
+# table(acs0$pa, acs0$year)
+# table(acs1$pa, acs1$year)
+# table(acs2$pa, acs2$year)
+# table(aps0$pa, aps0$year)
+# table(aps1$pa, aps1$year)
+# table(ghs0$pa, ghs0$year)
+# table(ghs1$pa, ghs1$year)
+# table(ghs2$pa, ghs2$year)
+
+Cacs1 <- AC_stos %>% filter(length > 17 & length <= 45) %>% filter(year != 1998 & year != 2017)
+Cacs2 <- AC_stos %>% filter(length > 45) %>% filter(year != 2015)
+Caps1 <- AP_stos %>% filter(length > 29) %>% filter(year != 2017)
+Cghs1 <- GH_stos %>% filter(length > 19 & length <= 40) %>% filter(year != 2017)
+Cghs2 <- GH_stos %>% filter(length > 40)
+
+Cacs0 <- AC_stos %>% filter(length < 18) %>% filter(year != 1996 & year != 1998 & year != 1999 & year != 2006 & year != 2011 & year != 2017)
+Caps0 <- AP_stos %>% filter(length < 30) %>% filter(year != 2017)
+Cghs0 <- GH_stos %>% filter(length < 20) %>% filter(year != 2015 & year != 2017)
+
+```
+
+### Fall
+```{r}
+# load rstrap set data
+load(file = "./ModelSaves/Set_Up/FC-2020.RData")
+
+
+acf1 <- AC_stof %>% filter(length > 17 & length <= 45)
+acf2 <- AC_stof %>% filter(length > 45)
+apf1 <- AP_stof %>% filter(length > 29)
+ghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
+ghf2 <- GH_stof %>% filter(length > 40)
+
+acf0 <- AC_stof %>% filter(length < 18)
+apf0 <- AP_stof %>% filter(length < 30)
+ghf0 <- GH_stof %>% filter(length < 20)
+
+# table(acf0$pa, acf0$year)
+# table(acf1$pa, acf1$year)
+# table(acf2$pa, acf2$year)
+# table(apf0$pa, apf0$year)
+# table(apf1$pa, apf1$year)
+# table(ghf0$pa, ghf0$year)
+# table(ghf1$pa, ghf1$year)
+# table(ghf2$pa, ghf2$year)
+
+Cacf1 <- AC_stof %>% filter(length > 17 & length <= 45)
+Cacf2 <- AC_stof %>% filter(length > 45) %>% filter(year != 1995)
+Capf1 <- AP_stof %>% filter(length > 29) %>% filter(year != 2014)
+Cghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
+Cghf2 <- GH_stof %>% filter(length > 40)
+
+Cacf0 <- AC_stof %>% filter(length < 18) %>% filter(year != 2011 & year != 2020)
+Capf0 <- AP_stof %>% filter(length < 30) %>% filter(year != 2014)
+Cghf0 <- GH_stof %>% filter(length < 20)
+
+```
+
+### Total
+```{r}
+
+Cac0 <- rbind(Cacs0, Cacf0) %>% mutate(alt.name = "Atlantic cod")
+Cac1 <- rbind(Cacs1, Cacf1) %>% mutate(alt.name = "Atlantic cod")
+Cac2 <- rbind(Cacs2, Cacf2) %>% mutate(alt.name = "Atlantic cod")
+Cap0 <- rbind(Caps0, Capf0) %>% mutate(alt.name = "American plaice")
+Cap1 <- rbind(Caps1, Capf1) %>% mutate(alt.name = "American plaice")
+Cgh0 <- rbind(Cghs0, Cghf0) %>% mutate(alt.name = "Greenland halibut")
+Cgh1 <- rbind(Cghs1, Cghf1) %>% mutate(alt.name = "Greenland halibut")
+Cgh2 <- rbind(Cghs2, Cghf2) %>% mutate(alt.name = "Greenland halibut")
+
+```
+
+
+## All data
+```{r}
+# Combine seasonal data for
+## Engel
+Eac0 <- rbind(Eacs0, Eacf0) %>% mutate(alt.name = "Atlantic cod")
+Eac1 <- rbind(Eacs1, Eacf1) %>% mutate(alt.name = "Atlantic cod")
+Eac2 <- rbind(Eacs2, Eacf2) %>% mutate(alt.name = "Atlantic cod")
+
+Eap0 <- rbind(Eaps0, Eapf0) %>% mutate(alt.name = "American plaice")
+Eap1 <- rbind(Eaps1, Eapf1) %>% mutate(alt.name = "American plaice")
+
+Egh0 <- rbind(Eghs0, Eghf0) %>% mutate(alt.name = "Greenland halibut")
+Egh1 <- rbind(Eghs1, Eghf1) %>% mutate(alt.name = "Greenland halibut")
+Egh2 <- rbind(Eghs2, Eghf2) %>% mutate(alt.name = "Greenland halibut")
+
+## Campelen
+Cac0 <- rbind(Cacs0, Cacf0) %>% mutate(alt.name = "Atlantic cod")
+Cac1 <- rbind(Cacs1, Cacf1) %>% mutate(alt.name = "Atlantic cod")
+Cac2 <- rbind(Cacs2, Cacf2) %>% mutate(alt.name = "Atlantic cod")
+
+Cap0 <- rbind(Caps0, Capf0) %>% mutate(alt.name = "American plaice")
+Cap1 <- rbind(Caps1, Capf1) %>% mutate(alt.name = "American plaice")
+
+Cgh0 <- rbind(Cghs0, Cghf0) %>% mutate(alt.name = "Greenland halibut")
+Cgh1 <- rbind(Cghs1, Cghf1) %>% mutate(alt.name = "Greenland halibut")
+Cgh2 <- rbind(Cghs2, Cghf2) %>% mutate(alt.name = "Greenland halibut")
+
+
+
+# Combine species data from the Engel and Campelen timeseries
+Tac0 <- rbind(Eac0, Cac0)
+Tac1 <- rbind(Eac1, Cac1)
+Tac2 <- rbind(Eac2, Cac2)
+
+Tap0 <- rbind(Eap0, Cap0)
+Tap1 <- rbind(Eap1, Cap1)
+
+Tgh0 <- rbind(Egh0, Cgh0)
+Tgh1 <- rbind(Egh1, Cgh1)
+Tgh2 <- rbind(Egh2, Cgh2)
+
+
+
+# Turn into dataframe
+dfac0 <- reshape(data.frame(table(Tac0$year, Tac0$season)), idvar = "Var1", timevar = "Var2", direction = "wide") %>% 
+  rename(ac0_spring = Freq.spring, ac0_fall = Freq.fall)
+dfgh0 <- reshape(data.frame(table(Tgh0$year, Tgh0$season)), idvar = "Var1", timevar = "Var2", direction = "wide") %>% 
+  rename(gh0_spring = Freq.spring, gh0_fall = Freq.fall)
+dfap0 <- reshape(data.frame(table(Tap0$year, Tap0$season)), idvar = "Var1", timevar = "Var2", direction = "wide") %>%  
+  rename(ap0_spring = Freq.spring, ap0_fall = Freq.fall)
+
+dfac1 <- reshape(data.frame(table(Tac1$year, Tac1$season)), idvar = "Var1", timevar = "Var2", direction = "wide") %>% 
+  rename(ac1_spring = Freq.spring, ac1_fall = Freq.fall)
+dfac2 <- reshape(data.frame(table(Tac2$year, Tac2$season)), idvar = "Var1", timevar = "Var2", direction = "wide") %>% 
+  rename(ac2_spring = Freq.spring, ac2_fall = Freq.fall)
+
+dfgh1 <- reshape(data.frame(table(Tgh1$year, Tgh1$season)), idvar = "Var1", timevar = "Var2", direction = "wide") %>% 
+  rename(gh1_spring = Freq.spring, gh1_fall = Freq.fall)
+dfgh2 <- reshape(data.frame(table(Tgh2$year, Tgh2$season)), idvar = "Var1", timevar = "Var2", direction = "wide") %>% 
+  rename(gh2_spring = Freq.spring, gh2_fall = Freq.fall)
+dfap1 <- reshape(data.frame(table(Tap1$year, Tap1$season)), idvar = "Var1", timevar = "Var2", direction = "wide") %>% 
+  rename(ap1_spring = Freq.spring, ap1_fall = Freq.fall)
+
+
+ac <- data.frame(year = seq(1984,2020,1), 
+                 ac0_spring = c(rep(0,11), dfac0$ac0_spring[1:16], 0, dfac0$ac0_spring[17:24], rep(0,1)),
+                 ac1_spring = c(dfac1$ac1_spring),
+                 ac2_spring = c(dfac2$ac2_spring[1:11], 0, dfac2$ac2_spring[12:36]),
+                 
+                 ac0_fall = c(rep(0,11), dfac0$ac0_fall[1:16], 0, dfac0$ac0_fall[17:24], rep(0,1)),
+                 ac1_fall = c(dfac1$ac1_fall),
+                 ac2_fall = c(dfac2$ac2_fall[1:11], 0, dfac2$ac2_fall[12:36]))
+write.csv(ac, file = "./Extra/acseason.csv")
+
+
+gh <- data.frame(year = seq(1984,2020,1), 
+                 gh0_spring = c(dfgh0$gh0_spring),
+                 gh1_spring = c(dfgh1$gh1_spring),
+                 gh2_spring = c(dfgh2$gh2_spring),
+                 
+                 gh0_fall = c(dfgh0$gh0_fall),
+                 gh1_fall = c(dfgh1$gh1_fall),
+                 gh2_fall = c(dfgh2$gh2_fall))
+write.csv(gh, file = "./Extra/ghseason.csv")
+
+
+ap <- data.frame(year = seq(1984,2020,1), 
+                 ap0_spring = c(dfap0$ap0_spring),
+                 ap1_spring = c(dfap1$ap1_spring),
+                 
+                 ap0_fall = c(dfap0$ap0_fall),
+                 ap1_fall = c(dfap1$ap1_fall))
+write.csv(ap, file = "./Extra/apseason.csv")
+
+```
+
+## - Table 1
+```{r}
+
+sample_size <- data.frame(
+  E.C.Spr = c(nrow(filter(Tac0, geartype == "engel" & season == "spring" & content == "called")),
+              nrow(filter(Tac1, geartype == "engel" & season == "spring" & content == "called")),
+              nrow(filter(Tac2, geartype == "engel" & season == "spring" & content == "called")),
+              nrow(filter(Tgh0, geartype == "engel" & season == "spring" & content == "called")),
+              nrow(filter(Tgh1, geartype == "engel" & season == "spring" & content == "called")),
+              nrow(filter(Tgh2, geartype == "engel" & season == "spring" & content == "called")),
+              nrow(filter(Tap0, geartype == "engel" & season == "spring" & content == "called")),
+              nrow(filter(Tap1, geartype == "engel" & season == "spring" & content == "called"))),
+  E.C.Fall = c(nrow(filter(Tac0, geartype == "engel" & season == "fall" & content == "called")),
+               nrow(filter(Tac1, geartype == "engel" & season == "fall" & content == "called")),
+               nrow(filter(Tac2, geartype == "engel" & season == "fall" & content == "called")),
+               nrow(filter(Tgh0, geartype == "engel" & season == "fall" & content == "called")),
+               nrow(filter(Tgh1, geartype == "engel" & season == "fall" & content == "called")),
+               nrow(filter(Tgh2, geartype == "engel" & season == "fall" & content == "called")),
+               nrow(filter(Tap0, geartype == "engel" & season == "fall" & content == "called")),
+               nrow(filter(Tap1, geartype == "engel" & season == "fall" & content == "called"))),
+  E.F.Spr = c(nrow(filter(Tac0, geartype == "engel" & season == "spring" & content == "full")),
+              nrow(filter(Tac1, geartype == "engel" & season == "spring" & content == "full")),
+              nrow(filter(Tac2, geartype == "engel" & season == "spring" & content == "full")),
+              nrow(filter(Tgh0, geartype == "engel" & season == "spring" & content == "full")),
+              nrow(filter(Tgh1, geartype == "engel" & season == "spring" & content == "full")),
+              nrow(filter(Tgh2, geartype == "engel" & season == "spring" & content == "full")),
+              nrow(filter(Tap0, geartype == "engel" & season == "spring" & content == "full")),
+              nrow(filter(Tap1, geartype == "engel" & season == "spring" & content == "full"))),
+  E.F.Fall = c(nrow(filter(Tac0, geartype == "engel" & season == "fall" & content == "full")),
+               nrow(filter(Tac1, geartype == "engel" & season == "fall" & content == "full")),
+               nrow(filter(Tac2, geartype == "engel" & season == "fall" & content == "full")),
+               nrow(filter(Tgh0, geartype == "engel" & season == "fall" & content == "full")),
+               nrow(filter(Tgh1, geartype == "engel" & season == "fall" & content == "full")),
+               nrow(filter(Tgh2, geartype == "engel" & season == "fall" & content == "full")),
+               nrow(filter(Tap0, geartype == "engel" & season == "fall" & content == "full")),
+               nrow(filter(Tap1, geartype == "engel" & season == "fall" & content == "full"))),
+  E.pempty =  c(nrow(filter(Tac0, geartype == "engel" & pa == "0"))/nrow(filter(Tac0, geartype == "engel"))*100,
+                nrow(filter(Tac1, geartype == "engel" & pa == "0"))/nrow(filter(Tac1, geartype == "engel"))*100,
+                nrow(filter(Tac2, geartype == "engel" & pa == "0"))/nrow(filter(Tac2, geartype == "engel"))*100,
+                nrow(filter(Tgh0, geartype == "engel" & pa == "0"))/nrow(filter(Tgh0, geartype == "engel"))*100,
+                nrow(filter(Tgh1, geartype == "engel" & pa == "0"))/nrow(filter(Tgh1, geartype == "engel"))*100,
+                nrow(filter(Tgh2, geartype == "engel" & pa == "0"))/nrow(filter(Tgh2, geartype == "engel"))*100,
+                nrow(filter(Tap0, geartype == "engel" & pa == "0"))/nrow(filter(Tap0, geartype == "engel"))*100,
+                nrow(filter(Tap1, geartype == "engel" & pa == "0"))/nrow(filter(Tap1, geartype == "engel"))*100),
+  
+  C.C.Spr = c(nrow(filter(Tac0, geartype == "campelen" & season == "spring" & content == "called")),
+              nrow(filter(Tac1, geartype == "campelen" & season == "spring" & content == "called")),
+              nrow(filter(Tac2, geartype == "campelen" & season == "spring" & content == "called")),
+              nrow(filter(Tgh0, geartype == "campelen" & season == "spring" & content == "called")),
+              nrow(filter(Tgh1, geartype == "campelen" & season == "spring" & content == "called")),
+              nrow(filter(Tgh2, geartype == "campelen" & season == "spring" & content == "called")),
+              nrow(filter(Tap0, geartype == "campelen" & season == "spring" & content == "called")),
+              nrow(filter(Tap1, geartype == "campelen" & season == "spring" & content == "called"))),
+  C.C.Fall = c(nrow(filter(Tac0, geartype == "campelen" & season == "fall" & content == "called")),
+               nrow(filter(Tac1, geartype == "campelen" & season == "fall" & content == "called")),
+               nrow(filter(Tac2, geartype == "campelen" & season == "fall" & content == "called")),
+               nrow(filter(Tgh0, geartype == "campelen" & season == "fall" & content == "called")),
+               nrow(filter(Tgh1, geartype == "campelen" & season == "fall" & content == "called")),
+               nrow(filter(Tgh2, geartype == "campelen" & season == "fall" & content == "called")),
+               nrow(filter(Tap0, geartype == "campelen" & season == "fall" & content == "called")),
+               nrow(filter(Tap1, geartype == "campelen" & season == "fall" & content == "called"))),
+  C.F.Spr = c(nrow(filter(Tac0, geartype == "campelen" & season == "spring" & content == "full")),
+              nrow(filter(Tac1, geartype == "campelen" & season == "spring" & content == "full")),
+              nrow(filter(Tac2, geartype == "campelen" & season == "spring" & content == "full")),
+              nrow(filter(Tgh0, geartype == "campelen" & season == "spring" & content == "full")),
+              nrow(filter(Tgh1, geartype == "campelen" & season == "spring" & content == "full")),
+              nrow(filter(Tgh2, geartype == "campelen" & season == "spring" & content == "full")),
+              nrow(filter(Tap0, geartype == "campelen" & season == "spring" & content == "full")),
+              nrow(filter(Tap1, geartype == "campelen" & season == "spring" & content == "full"))),
+  C.F.Fall = c(nrow(filter(Tac0, geartype == "campelen" & season == "fall" & content == "full")),
+               nrow(filter(Tac1, geartype == "campelen" & season == "fall" & content == "full")),
+               nrow(filter(Tac2, geartype == "campelen" & season == "fall" & content == "full")),
+               nrow(filter(Tgh0, geartype == "campelen" & season == "fall" & content == "full")),
+               nrow(filter(Tgh1, geartype == "campelen" & season == "fall" & content == "full")),
+               nrow(filter(Tgh2, geartype == "campelen" & season == "fall" & content == "full")),
+               nrow(filter(Tap0, geartype == "campelen" & season == "fall" & content == "full")),
+               nrow(filter(Tap1, geartype == "campelen" & season == "fall" & content == "full"))),
+  C.pempty =  c(nrow(filter(Tac0, geartype == "campelen" & pa == "0"))/nrow(filter(Tac0, geartype == "campelen"))*100,
+                nrow(filter(Tac1, geartype == "campelen" & pa == "0"))/nrow(filter(Tac1, geartype == "campelen"))*100,
+                nrow(filter(Tac2, geartype == "campelen" & pa == "0"))/nrow(filter(Tac2, geartype == "campelen"))*100,
+                nrow(filter(Tgh0, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh0, geartype == "campelen"))*100,
+                nrow(filter(Tgh1, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh1, geartype == "campelen"))*100,
+                nrow(filter(Tgh2, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh2, geartype == "campelen"))*100,
+                nrow(filter(Tap0, geartype == "campelen" & pa == "0"))/nrow(filter(Tap0, geartype == "campelen"))*100,
+                nrow(filter(Tap1, geartype == "campelen" & pa == "0"))/nrow(filter(Tap1, geartype == "campelen"))*100)
+
+)
+
+sample_size <- sample_size %>% mutate(E.pempty = format(E.pempty, digits = 4), C.pempty = format(C.pempty, digits = 4))
+
+write.csv(x = sample_size, file = "./Extra/samplesize.csv")
+
+```
+
+# Annual input trends
+
+## Engel
+
+### Spring
+
+```{r}
+
+load(file = "./ModelSaves/SprEng_Length.RData")
+
+data <- fishy_dat
+
+uni_names <- unique(data$names)
+dat_names <- c("Index", uni_names)
+
+new_list <- list()
+
+for(i in 1:length(uni_names)){
+  one_dex <- subset(data, names == uni_names[i])
+  new_list[[i]] <- aggregate(one_dex$pa, by = list(one_dex$year), FUN = mean, na.rm = TRUE)
+}
+
+multi_inner <- Reduce(
+  function(x, y, ...) plyr::join(x, y, by = "Group.1", ...), 
+  new_list
+)
+
+#Functional Response equation
+for(i in 1:(length(uni_names)-1)){
+  multi_inner[,i+(length(uni_names)+1)] <- ((multi_inner[ ,i+2]*(rep$chi[i]^rep$beta[i]))/(1-multi_inner[ ,i+2]))^(1/rep$beta[i])
+}
+
+# Reverse log transform input values
+multi_inner[,2] <- log(1/(1-multi_inner[ ,2]))
+for(i in 1:(length(uni_names)-1)){
+  multi_inner[,i+(length(uni_names)+1)] <- log(1/(1-multi_inner[ ,i+(length(uni_names)+1)])) # produces NAs but not to worry about
+}
+
+
+# Add all input data into one dataframe
+plotdf <- data.frame(time = multi_inner[,1], 
+                     ts = multi_inner[,2],
+                     ac1 = multi_inner[,8], 
+                     ac2 = multi_inner[,9],
+                     gh1 = multi_inner[,10],
+                     gh2 = multi_inner[,11],
+                     ap1 = multi_inner[,12]
+                     )
+
+
+# plot
+se <- ggplot(data = plotdf) +  
+  geom_line(aes(x = time, y = ts, colour = "trawl"), size = 1.4, linetype = "dashed") +
+  
+  geom_line( aes(x = time, y = ac1, colour = "ac", linetype = "medium"), size = 1.4) +
+  geom_line(aes(x = time, y = ac2, colour = "ac", linetype = "large"), size = 1.4) +
+  
+  geom_line(aes(x = time, y = gh1, colour = "gh", linetype = "medium"), size = 1.4) +
+  geom_line(aes(x = time, y = gh2, colour = "gh", linetype = "large"), size = 1.4) +
+  
+  geom_line(aes(x = time, y = ap1, colour = "ap", linetype = "medium"), size = 1.4) +
+  
+  scale_x_continuous(name = "Year", expand = c(0.009,0), limits = c(1983.9,1995.2), breaks = c(seq(1983,1995, 2))) + 
+  scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.0,1.7)) +
+  scale_color_manual(name = "", values = c(trawl = "brown", ac = "#BC8DA0", gh = "#048BA8", ap = "#AFD5AA"),
+                     labels = c(trawl = "Trawl", ac = "Atlantic cod", gh = "Greenland halibut", ap = "American plaice")) +
+  scale_linetype_manual(name = "", values = c(medium = "solid", large = "dotdash"),
+                        labels = c(medium = "Medium", large = "Large")) +
+  ggtitle("Engel\na) 3L Spring") +
+  theme_classic() +
+  theme(legend.position = "none", 
+        axis.title.x = element_blank(),
+        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
+        plot.title = element_text(size = 16, face = "bold"))
+
+```
+
+### Fall
+
+```{r, fig.width=10, fig.height=8}
+
+load(file = "./ModelSaves/ACAP-FallEng_Length.RData")
+load(file = "./ModelSaves/GH-FallEng_Length.RData")
+
+# Set up index df - GH
+gh_data <- gh_fishy_dat
+gh_uni_names <- unique(gh_data$names)
+gh_dat_names <- c("Index", gh_uni_names)
+
+gh_new_list <- list()
+for(i in 1:length(gh_uni_names)){
+  gh_one_dex <- subset(gh_data, names == gh_uni_names[i])
+  gh_new_list[[i]] <- aggregate(gh_one_dex$pa, by = list(gh_one_dex$year), FUN = mean, na.rm = TRUE)
+}
+
+gh_multi_inner <- Reduce(
+  function(x, y, ...) plyr::join(x, y, by = "Group.1", ...), 
+  gh_new_list
+)
+
+#Functional Response equation
+for(i in 1:(length(gh_uni_names)-1)){
+  gh_multi_inner[,i+(length(gh_uni_names)+1)] <- ((gh_multi_inner[ ,i+2]*(gh_rep$chi[i]^gh_rep$beta[i]))/(1-gh_multi_inner[ ,i+2]))^(1/gh_rep$beta[i])
+}
+
+# Reverse log transform input values
+gh_multi_inner[,2] <- log(1/(1-gh_multi_inner[ ,2]))
+for(i in 1:(length(gh_uni_names)-1)){
+  gh_multi_inner[,i+(length(gh_uni_names)+1)] <- log(1/(1-gh_multi_inner[ ,i+(length(gh_uni_names)+1)])) # produces NAs but not to worry about
+}
+
+
+
+# Set up index df - AC
+ac_data <- ac_fishy_dat
+ac_uni_names <- unique(ac_data$names)
+ac_dat_names <- c("Index", ac_uni_names)
+
+ac_new_list <- list()
+for(i in 1:length(ac_uni_names)){
+  ac_one_dex <- subset(ac_data, names == ac_uni_names[i])
+  ac_new_list[[i]] <- aggregate(ac_one_dex$pa, by = list(ac_one_dex$year), FUN = mean, na.rm = TRUE)
+}
+
+ac_multi_inner <- Reduce(
+  function(x, y, ...) plyr::join(x, y, by = "Group.1", ...), 
+  ac_new_list
+)
+
+
+#Functional Response equation
+for(i in 1:(length(ac_uni_names)-1)){
+  ac_multi_inner[,i+(length(ac_uni_names)+1)] <- ((ac_multi_inner[ ,i+2]*(ac_rep$chi[i]^ac_rep$beta[i]))/(1-ac_multi_inner[ ,i+2]))^(1/ac_rep$beta[i])
+}
+
+# Reverse log transform input values
+ac_multi_inner[,2] <- log(1/(1-ac_multi_inner[ ,2])) # have to transform trawl separately bc at start of df
+for(i in 1:(length(ac_uni_names)-1)){
+  ac_multi_inner[,i+(length(ac_uni_names)+1)] <- log(1/(1-ac_multi_inner[ ,i+(length(ac_uni_names)+1)])) # produces NAs but not to worry about
+}
+
+
+
+
+# Add all input data into one dataframe
+plotdf <- data.frame(time = gh_multi_inner[,1], 
+                     ts = gh_multi_inner[,2],
+                     ac1 = ac_multi_inner[,6], 
+                     ac2 = ac_multi_inner[,7],
+                     gh1 = gh_multi_inner[,5],
+                     gh2 = gh_multi_inner[,6],
+                     ap1 = ac_multi_inner[,8]
+                     )
+
+
+# plot
+fe <- ggplot(data = plotdf) +  
+  geom_line(aes(x = time, y = ts, colour = "trawl"), size = 1.4, linetype = "dashed") +
+  
+  geom_line( aes(x = time, y = ac1, colour = "ac", linetype = "medium"), size = 1.4) +
+  geom_line(aes(x = time, y = ac2, colour = "ac", linetype = "large"), size = 1.4) +
+  
+  geom_line(aes(x = time, y = gh1, colour = "gh", linetype = "medium"), size = 1.4) +
+  geom_line(aes(x = time, y = gh2, colour = "gh", linetype = "large"), size = 1.4) +
+  
+  geom_line(aes(x = time, y = ap1, colour = "ap", linetype = "medium"), size = 1.4) +
+  
+  scale_x_continuous(name = "Year", expand = c(0.009,0), limits = c(1983.9,1995.2), breaks = c(seq(1983,1995, 2))) + 
+  scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0)) +
+  scale_color_manual(name = "", values = c(trawl = "brown", ac = "#BC8DA0", gh = "#048BA8", ap = "#AFD5AA"),
+                     labels = c(trawl = "Trawl", ac = "Atlantic cod", gh = "Greenland halibut", ap = "American plaice")) +
+  scale_linetype_manual(name = "", values = c(medium = "solid", large = "dotdash"),
+                        labels = c(medium = "Medium", large = "Large")) +
+  ggtitle("c) 2J3KL Fall") + 
+  theme_classic() +
+  theme(legend.position = "none",
+        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
+        plot.title = element_text(size = 16, face = "bold"))
+
+
+```
+
+## Campelen
+
+### Spring
+
+```{r Fall Campelen, fig.height=8, fig.width=10}
+
+load(file = "./ModelSaves/ACAP-SprCamp_Base.RData")
+load(file = "./ModelSaves/GH-SprCamp_Base.RData")
+
+
+# Set up index df - GH
+gh_data <- gh_fishy_dat
+gh_uni_names <- unique(gh_data$names)
+gh_dat_names <- c("Index", gh_uni_names)
+
+gh_new_list <- list()
+for(i in 1:length(gh_uni_names)){
+  gh_one_dex <- subset(gh_data, names == gh_uni_names[i])
+  gh_new_list[[i]] <- aggregate(gh_one_dex$pa, by = list(gh_one_dex$year), FUN = mean, na.rm = TRUE)
+}
+
+gh_multi_inner <- Reduce(
+  function(x, y, ...) plyr::join(x, y, by = "Group.1", ...), 
+  gh_new_list
+)
+
+#Functional Response equation
+for(i in 1:(length(gh_uni_names)-1)){
+  gh_multi_inner[,i+(length(gh_uni_names)+1)] <- ((gh_multi_inner[ ,i+2]*(gh_rep$chi[i]^gh_rep$beta[i]))/(1-gh_multi_inner[ ,i+2]))^(1/gh_rep$beta[i])
+}
+
+# Reverse log transform input values
+gh_multi_inner[,2] <- log(1/(1-gh_multi_inner[ ,2]))
+for(i in 1:(length(gh_uni_names)-1)){
+  gh_multi_inner[,i+(length(gh_uni_names)+1)] <- log(1/(1-gh_multi_inner[ ,i+(length(gh_uni_names)+1)])) # produces NAs but not to worry about
+}
+
+
+
+# Set up index df - AC
+ac_data <- ac_fishy_dat
+ac_uni_names <- unique(ac_data$names)
+ac_dat_names <- c("Index", ac_uni_names)
+
+ac_new_list <- list()
+for(i in 1:length(ac_uni_names)){
+  ac_one_dex <- subset(ac_data, names == ac_uni_names[i])
+  ac_new_list[[i]] <- aggregate(ac_one_dex$pa, by = list(ac_one_dex$year), FUN = mean, na.rm = TRUE)
+}
+
+ac_multi_inner <- Reduce(
+  function(x, y, ...) plyr::join(x, y, by = "Group.1", ...), 
+  ac_new_list
+)
+
+
+#Functional Response equation
+for(i in 1:(length(ac_uni_names)-1)){
+  ac_multi_inner[,i+(length(ac_uni_names)+1)] <- ((ac_multi_inner[ ,i+2]*(ac_rep$chi[i]^ac_rep$beta[i]))/(1-ac_multi_inner[ ,i+2]))^(1/ac_rep$beta[i])
+}
+
+# Reverse log transform input values
+ac_multi_inner[,2] <- log(1/(1-ac_multi_inner[ ,2])) # have to transform trawl separately bc at start of df
+for(i in 1:(length(ac_uni_names)-1)){
+  ac_multi_inner[,i+(length(ac_uni_names)+1)] <- log(1/(1-ac_multi_inner[ ,i+(length(ac_uni_names)+1)])) # produces NAs but not to worry about
+}
+
+
+
+
+# Add all input data into one dataframe
+plotdf <- data.frame(time = gh_multi_inner[,1], 
+                     ts = gh_multi_inner[,2],
+                     ac1 = ac_multi_inner[,5], 
+                     gh1 = gh_multi_inner[,4],
+                     ap1 = ac_multi_inner[,6]
+                     )
+
+
+# plot
+sc <- ggplot(data = plotdf) +  
+  geom_line(aes(x = time, y = ts, colour = "trawl"), size = 1.4, linetype = "dashed") +
+  
+  geom_line( aes(x = time, y = ac1, colour = "ac"), size = 1.4, linetype = "solid") +
+  
+  geom_line(aes(x = time, y = gh1, colour = "gh"), size = 1.4, linetype = "solid") +
+  
+  geom_line(aes(x = time, y = ap1, colour = "ap"), size = 1.4, linetype = "solid") +
+  
+  scale_x_continuous(name = "Year", expand = c(0,0.1), limits = c(1994.9,2022), breaks = c(seq(1995, 2022, 5))) + 
+  scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.95, 2.2)) +
+  scale_color_manual(name = "", values = c(trawl = "brown", ac = "#BC8DA0", gh = "#048BA8", ap = "#AFD5AA"),
+                     labels = c(trawl = "Trawl", ac = "Atlantic cod", gh = "Greenland halibut", ap = "American plaice")) +
+  ggtitle("Campelen\nb) 3L Spring") + 
+  theme_classic() + 
+  theme(legend.position = "none",
+        axis.title.x = element_blank(), 
+        axis.title.y = element_blank(),
+        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
+        plot.title = element_text(size = 16, face = "bold"))
+
+```
+
+### Fall
+
+```{r Fall Campelen, fig.height=8, fig.width=10}
+
+load(file = "./ModelSaves/FallCamp_Length.RData")
+
+data <- fishy_dat
+
+uni_names <- unique(data$names)
+dat_names <- c("Index", uni_names)
+
+new_list <- list()
+
+for(i in 1:length(uni_names)){
+  one_dex <- subset(data, names == uni_names[i])
+  new_list[[i]] <- aggregate(one_dex$pa, by = list(one_dex$year), FUN = mean, na.rm = TRUE)
+}
+
+multi_inner <- Reduce(
+  function(x, y, ...) plyr::join(x, y, by = "Group.1", ...), 
+  new_list
+)
+
+#Functional Response equation
+for(i in 1:(length(uni_names)-1)){
+  multi_inner[,i+(length(uni_names)+1)] <- ((multi_inner[ ,i+2]*(rep$chi[i]^rep$beta[i]))/(1-multi_inner[ ,i+2]))^(1/rep$beta[i])
+}
+
+# Reverse log transform input values
+multi_inner[,2] <- log(1/(1-multi_inner[ ,2]))
+for(i in 1:(length(uni_names)-1)){
+  multi_inner[,i+(length(uni_names)+1)] <- log(1/(1-multi_inner[ ,i+(length(uni_names)+1)])) # produces NAs but not to worry about
+}
+
+
+# Add all input data into one dataframe
+plotdf <- data.frame(time = multi_inner[,1], 
+                     ts = multi_inner[,2],
+                     ac1 = multi_inner[,8], 
+                     ac2 = multi_inner[,9],
+                     gh1 = multi_inner[,10],
+                     gh2 = multi_inner[,11],
+                     ap1 = multi_inner[,12]
+                     )
+
+
+# plot
+fc <- ggplot(data = plotdf) +  
+  geom_line(aes(x = time, y = ts, colour = "trawl"), size = 1.4, linetype = "dashed") +
+  
+  geom_line( aes(x = time, y = ac1, colour = "ac", linetype = "medium"), size = 1.4) +
+  geom_line(aes(x = time, y = ac2, colour = "ac", linetype = "large"), size = 1.4) +
+  
+  geom_line(aes(x = time, y = gh1, colour = "gh", linetype = "medium"), size = 1.4) +
+  geom_line(aes(x = time, y = gh2, colour = "gh", linetype = "large"), size = 1.4) +
+  
+  geom_line(aes(x = time, y = ap1, colour = "ap", linetype = "medium"), size = 1.4) +
+  
+  scale_x_continuous(name = "Year", expand = c(0,0.1), limits = c(1994.9,2022), breaks = c(seq(1995, 2022, 5))) + 
+  scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.32, 1.6)) +
+  scale_color_manual(name = "", values = c(trawl = "brown", ac = "#BC8DA0", gh = "#048BA8", ap = "#AFD5AA"),
+                     labels = c(trawl = "Trawl", ac = "Atlantic cod", gh = "Greenland halibut", ap = "American plaice")) +
+  scale_linetype_manual(name = "", values = c(medium = "solid", large = "dotdash"),
+                        labels = c(medium = "Medium", large = "Large")) +
+  ggtitle("d) 2J3KL Fall") + 
+  theme_classic() + 
+  theme(legend.position = "none", 
+        axis.title.y = element_blank(),
+        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
+        plot.title = element_text(size = 16, face = "bold"))
+
+
+```
+## - Figure 2
+```{r, fig.height=10, fig.width=12}
+
+p1 <- ggarrange(se,
+          sc,
+          fe,
+          fc,
+          nrow = 2, ncol = 2,
+          align = "v", common.legend = TRUE,
+          legend = "right", legend.grob = ggpubr::get_legend(fc+theme(legend.position = "right", lengend.text = element_text(size = 15))))
+
+ggsave(filename = "inputdata1.tiff", device = "tiff", plot = p1, path = "./Figures",
+       dpi = 300, width = 14, height = 10, units = "in")
+
+
+```
+
+# Residuals
+
+## - Figure 3
+```{r, fig.width=7, fig.height=4}
+load(file = "./ModelSaves/FallCamp_Length.RData")
+
+sim_response <- replicate(250, obj$simulate()$pa)
+
+sim_res <- DHARMa::createDHARMa(simulatedResponse = sim_response, observedResponse = tmb_data$pa, fittedPredictedResponse = rep$new_mu)
+
+DHARMa::plotQQunif(sim_res, testUniformity=F, testDispersion = F, testOutliers = F)
+
+DHARMa::plotResiduals(sim_res, form = as.factor(tmb_data$idex))
+DHARMa::plotResiduals(sim_res, form = as.factor(tmb_data$iyear))
+
+```
+
+# Functional response
+
+```{r, fig.width=5, fig.height=5}
+load(file = "./ModelSaves/FallCamp_Length.RData")
+
+# Setup df for FR curve
+newx <- seq(from = 0, to = 1, by = 0.001)
+
+## set estimates
+beta_est <- as.numeric(sdrep$value[names(sdrep$value) == "beta"])
+chi_est <- as.numeric(sdrep$value[names(sdrep$value) == "chi"])
+scl_est <- as.numeric(sdrep$value[names(sdrep$value) == "scl"])
+
+#set up for temperature modification on fr
+omega_df <- data.frame(tomega = rep$tomega, id = fishy_dat$idex) %>% filter(id > 0) %>% 
+  mutate(omega = ((tomega-rep(rep$scl, n[2:6]))/(1-rep(rep$scl, n[2:6]))))
+omega_df <- data.frame(tomega = rep$tomega, idex = rep$idex) # match omega vector with idex vector
+omega_df <- subset(omega_df, idex > 0) # removes trawl omega because it doenst have FR
+omega_df[,3] <- ((omega_df$tomega-rep(rep$scl, n[2:6]))/(1-rep(rep$scl, n[2:6])))
+omega_df <- aggregate(omega_df[,3], by = list(omega_df[,2]), FUN = mean)
+omega <- omega_df$x # take only omega value
+
+idmod <- unique(rep$idmod)
+
+rate <- list()
+for(i in 1:length(rep$scl)){
+  rate[[i]] <- ((1*(newx^beta_est[i]))/((chi_est[i]^beta_est[i])+(newx^beta_est[i])))
+}
+
+# CI
+## format standard deviation
+beta_sd <- as.numeric(sdrep$sd[names(sdrep$value) == "beta"])
+## generate confidence intervals
+beta_low <- vector()
+beta_high <- vector()
+for(i in 1:length(beta_sd)){
+  beta_low[i] <- beta_est[i] - qnorm(0.975)*beta_sd[i]
+  beta_high[i] <- beta_est[i] + qnorm(0.975)*beta_sd[i]
+}
+
+## format standard deviation
+chi_sd <- as.numeric(sdrep$sd[names(sdrep$value) == "chi"])
+## generate confidence intervals
+chi_low <- vector()
+chi_high <- vector()
+for(i in 1:length(chi_sd)){
+  chi_low[i] <- chi_est[i] - qnorm(0.975)*chi_sd[i]
+  chi_high[i] <- chi_est[i] + qnorm(0.975)*chi_sd[i]
+}
+
+## format standard deviation
+scl_sd <- as.numeric(sdrep$sd[names(sdrep$value) == "scl"])
+## generate confidence intervals
+scl_low <- vector()
+scl_high <- vector()
+for(i in 1:length(scl_sd)){
+  scl_low[i] <- scl_est[i] - qnorm(0.975)*scl_sd[i]
+  scl_high[i] <- scl_est[i] + qnorm(0.975)*scl_sd[i]
+}
+
+
+rate_high <- list()
+rate_low <- list()
+for(i in 1:length(chi_est)){
+  rate_high[[i]] <- ((1*(newx^beta_high[i]))/((chi_high[i]^beta_high[i])+(newx^beta_high[i])))
+  rate_low[[i]] <- ((1*(newx^beta_low[i]))/((chi_low[i]^beta_low[i])+(newx^beta_low[i])))
+}
+
+
+```
+
+## - Table 2
+```{r}
+load(file = "./ModelSaves/FallCamp_Length.RData")
+
+beta_est <- as.numeric(sdrep$value[names(sdrep$value) == "beta"])
+chi_est <- as.numeric(sdrep$value[names(sdrep$value) == "chi"])
+scl_est <- as.numeric(sdrep$value[names(sdrep$value) == "scl"])
+
+# CI
+beta_sd <- as.numeric(sdrep$sd[names(sdrep$value) == "beta"])
+beta_low <- vector()
+beta_high <- vector()
+for(i in 1:length(beta_sd)){
+  beta_low[i] <- beta_est[i] - qnorm(0.975)*beta_sd[i]
+  beta_high[i] <- beta_est[i] + qnorm(0.975)*beta_sd[i]}
+
+chi_sd <- as.numeric(sdrep$sd[names(sdrep$value) == "chi"])
+chi_low <- vector()
+chi_high <- vector()
+for(i in 1:length(chi_sd)){
+  chi_low[i] <- chi_est[i] - qnorm(0.975)*chi_sd[i]
+  chi_high[i] <- chi_est[i] + qnorm(0.975)*chi_sd[i]}
+
+scl_sd <- as.numeric(sdrep$sd[names(sdrep$value) == "scl"])
+scl_low <- vector()
+scl_high <- vector()
+for(i in 1:length(scl_sd)){
+  scl_low[i] <- scl_est[i] - qnorm(0.975)*scl_sd[i]
+  scl_high[i] <- scl_est[i] + qnorm(0.975)*scl_sd[i]}
+
+
+this <- data.frame(
+  estimate = c(
+    format(beta_est[1], digits = 4),format(chi_est[1], digits = 4),format(scl_est[1], digits = 4), 
+    format(beta_est[2], digits = 4),format(chi_est[2], digits = 4),format(scl_est[2], digits = 4), 
+    format(beta_est[3], digits = 4),format(chi_est[3], digits = 4),format(scl_est[3], digits = 4), 
+    format(beta_est[4], digits = 4),format(chi_est[4], digits = 4),format(scl_est[4], digits = 4), 
+    format(beta_est[5], digits = 4),format(chi_est[5], digits = 4),format(scl_est[5], digits = 4)),
+  CI = c(
+    paste("[", format(beta_low[1], digits = 3), ",", format(beta_high[1], digits = 3), "]", sep = ""),
+    paste("[", format(chi_low[1], digits = 3), ",", format(chi_high[1], digits = 3), "]", sep = ""),
+    paste("[", format(scl_low[1], digits = 3), ",", format(scl_high[1], digits = 3), "]", sep = ""),
+    paste("[", format(beta_low[2], digits = 3), ",", format(beta_high[2], digits = 3), "]", sep = ""),
+    paste("[", format(chi_low[2], digits = 3), ",", format(chi_high[2], digits = 3), "]", sep = ""),
+    paste("[", format(scl_low[2], digits = 3), ",", format(scl_high[2], digits = 3), "]", sep = ""),
+    paste("[", format(beta_low[3], digits = 3), ",", format(beta_high[3], digits = 3), "]", sep = ""),
+    paste("[", format(chi_low[3], digits = 3), ",", format(chi_high[3], digits = 3), "]", sep = ""),
+    paste("[", format(scl_low[3], digits = 3), ",", format(scl_high[3], digits = 3), "]", sep = ""),
+    paste("[", format(beta_low[4], digits = 3), ",", format(beta_high[4], digits = 3), "]", sep = ""),
+    paste("[", format(chi_low[4], digits = 3), ",", format(chi_high[4], digits = 3), "]", sep = ""),
+    paste("[", format(scl_low[4], digits = 3), ",", format(scl_high[4], digits = 3), "]", sep = ""),
+    paste("[", format(beta_low[5], digits = 3), ",", format(beta_high[5], digits = 3), "]", sep = ""),
+    paste("[", format(chi_low[5], digits = 3), ",", format(chi_high[5], digits = 3), "]", sep = ""),
+    paste("[", format(scl_low[5], digits = 3), ",", format(scl_high[5], digits = 3), "]", sep = ""))
+)
+
+
+write.csv(x = this, file = "./Figures/frestimates.csv")
+
+```
+
+## - Figure 4
+```{r}
+
+ggplot() +
+  geom_line(aes(x = newx, y = rate[[1]], colour = "ac", linetype = "c1"), size = 0.8) +
+  geom_line(aes(x = newx, y = rate[[2]], colour = "ac", linetype = "c2"), size = 0.8) +
+  geom_line(aes(x = newx, y = rate[[3]], colour = "gh", linetype = "c1"), size = 0.8) +
+  geom_line(aes(x = newx, y = rate[[4]], colour = "gh", linetype = "c2"), size = 0.8) +
+  geom_line(aes(x = newx, y = rate[[5]], colour = "ap", linetype = "c2"), size = 0.8) +
+
+  scale_x_continuous(name = "Relative prey density", limits = c(0,1.02), breaks = c(seq(0,1,0.5)), expand = c(0,0)) +
+  scale_y_continuous(name = "Probability of consumption", limits = c(0,1.01), breaks = c(seq(0,1,0.5)), expand = c(0,0)) +
+  scale_color_manual(name = "Species", values = c(ac = "#A4243B", gh = "#048BA8", ap = "#FF7733"),
+                     labels = c(ac = "Atlantic cod", gh = "Greenland halibut", ap = "American plaice")) +
+  scale_linetype_manual(name = "Length category", , values = c(c1 = "solid", c2 = "dotdash"),
+                        labels = c(c1 = "Medium", c2 = "Large")) +
+  guides(colour = guide_legend(keyheight = 0.4, default.unit = "cm"),
+         linetype = guide_legend(keyheight = 0.4, default.unit = "cm")) +
+  theme_classic() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),
+        legend.position = c(0.35,0.68), legend.direction = "vertical", legend.spacing.y = unit(.1, 'cm'), 
+        legend.text = element_text(size = 15), legend.title = element_text(size = 16, face = "bold"), legend.spacing.x = unit(0,'cm'),
+        axis.line.x = element_line(size = 0.5), 
+        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
+)
+
+ggsave(filename = "bestfr.tiff", device = "tiff", plot = last_plot(), path = "./Figures",
+       dpi = 300, width = 5, height = 5, units = "in")
+
+```
+
+# Called to full contents
+
+## Engel
+
+```{r, fig.width=14,fig.height=14}
+# load rstrap set data
+load(file = "./Data/setdet.rda") 
+setdet <- setdet %>% mutate(v.t.s = paste(vessel,trip,set, sep = ".")) %>% 
+  filter(spec == "889"|spec == "438"|spec == "892") %>%
+  mutate(lat_dd = as.numeric(format(trimws(lat.start), digits = 5)),
+         long_dd = as.numeric(format(trimws(long.start), digits = 5)))
+
+
+# Trawl data
+eng_fall <- read.csv("./Data/camp_capelin_2J3KL_FULL.csv") %>% rename(year = YEAR, trawl_pa = Capelin_PA) %>% 
+  mutate(v.t.s = paste(VESSEL,TRIP,SET, sep = "."),
+         season = ifelse(MONTH == 3|MONTH == 4|MONTH == 5|MONTH == 6|MONTH == 7, "spring", "fall"))
+eng_fall <- left_join(eng_fall, 
+                       setdet %>% select(v.t.s, set.depth.max, data.series, bot.temp), by = c("v.t.s"), multiple = "any")
+eng_fall <- eng_fall %>% filter(data.series == "Engel" & 
+                                    season == "fall"& 
+                                    is.na(bot.temp) == FALSE) %>%
+  mutate(lat_dd = as.numeric(trimws(lat_dd)),
+         long_dd = as.numeric(trimws(long_dd))) %>% 
+  filter(year >= 1984)
+
+
+# Called stomach data
+load(file = "./Data/ag.rda")
+
+call_fall <- ag %>% select(-c(source.file, oedge:gutremvol)) %>%  
+  filter((spec == "889" | spec == "438" | spec == "892") & 
+           (NAFOdiv == "2J" | NAFOdiv == "3K" |NAFOdiv == "3L") &
+           which.survey == "multispecies") %>% 
+  mutate(v.t.s = paste(vessel, trip, set, sep = "."),
+         alt.name = spec,
+         alt.name = ifelse(alt.name == "889", "American plaice", alt.name),
+         alt.name = ifelse(alt.name == "438", "Atlantic cod", alt.name),
+         alt.name = ifelse(alt.name == "892", "Greenland halibut", alt.name),
+         pa = ifelse(prey1 == "Capelin"|prey2 == "Capelin", 1, 0), 
+         content = rep("called", length(data.series)),
+         season = ifelse(month == 3|month == 4|month == 5|month == 6|month == 7, "spring", "fall"))
+call_fall <- left_join(call_fall, 
+                       setdet %>% select(v.t.s, lat_dd, long_dd, set.depth.max, bot.temp), by = c("v.t.s"), multiple = "any")
+call_fall <- call_fall %>%
+  filter(data.series == "Engel" & 
+           is.na(length) == FALSE & 
+           is.na(empty) == FALSE & 
+           is.na(bot.temp) == FALSE)
+
+
+# Full stomach data
+full_fall <- read.csv("./Data/NAFC_diet_capelin_COD_TURBOT_PLAICE_2J3KL.csv") %>% mutate(v.t.s = paste(VESSEL,TRIP,SET, sep = "."))
+full_fall <- left_join(full_fall, 
+                       setdet %>% select(v.t.s, set.depth.max, data.series, bot.temp), by = c("v.t.s"), multiple = "any")
+full_fall <- full_fall %>% mutate(alt.name = PRED_COMM_NAME,
+                                  alt.name = ifelse(alt.name == "AMERICAN PLAICE", "American plaice", alt.name),
+                                  alt.name = ifelse(alt.name == "COD,ATLANTIC", "Atlantic cod", alt.name),
+                                  alt.name = ifelse(alt.name == "TURBOT", "Greenland halibut", alt.name),
+                                  pa = ifelse(PREY_CAP == "Capelin", 1, 0),
+                                  empty = ifelse(PREY_CAP == "Empty", TRUE, FALSE),
+                                  content = rep("full", length(PRED_COMM_NAME)),
+                                  SEASON = ifelse(MONTH == 3|MONTH == 4|MONTH == 5|MONTH == 6|MONTH == 7, "spring", "fall")) %>% 
+  rename(year = YEAR, month = MONTH, length = LENGTH, NAFOdiv = NAFO, season = SEASON) %>%
+  filter(data.series == "Engel" & 
+           length < 400 & 
+           is.na(length) == FALSE & 
+           is.na(bot.temp) == FALSE)
+
+
+ratiod <- data.frame(content = c(call_fall$content, full_fall$content), 
+                     pa = c(call_fall$pa, full_fall$pa), 
+                     year = c(call_fall$year, full_fall$year),
+                     alt.name = c(call_fall$alt.name, full_fall$alt.name),
+                     season = c(call_fall$season, full_fall$season))
+
+
+avvspp <- ratiod %>% count(content, year, pa, alt.name, season) %>% group_by(content, year, alt.name, season) %>% mutate(freq = n/sum(n))
+
+only1s <- subset(avvspp, pa == 1) %>% filter(year > 1983)
+only1s$freq <- as.numeric(only1s$freq)
+
+# Create a blank data frame representing all years 
+blank <- data.frame(content = c(rep("called", 72),rep("full", 72)),
+           year = c(rep(seq(1984,1995),6), rep(seq(1984,1995),6)),
+           pa = rep(1, 144),
+           alt.name = rep(c(rep("American plaice", 12), rep("Atlantic cod", 12), rep("Greenland halibut", 12)), 2),
+           season = rep(c(rep("spring", 36), rep("fall", 36)), 2),
+           n = rep(NA, 144),
+           freq = rep(NA, 144)
+)
+
+# Add observations from initial data.frame while retaining NAs
+for(i in 1:nrow(blank)){
+  for(j in 1:nrow(only1s)){
+    if(only1s[j,1] == blank[i,1] & only1s[j,2] == blank[i,2] & only1s[j,4] == blank[i,4] & only1s[j,5] == blank[i,5]){
+      blank[i,6] = only1s[j,6]
+      blank[i,7] = only1s
+    }
+  }
+  }
+
+# Format blank data.frame for nice figure
+blank <- blank %>% mutate(season = ifelse(season == "fall", "Fall", "Spring"),
+                          content = ifelse(content == "called", "Called", "Full"))
+
+
+ggplot(blank) +
+  geom_line(aes(x = year, y = freq, colour = as.factor(content), group = as.factor(content))) +
+  geom_point(aes(x = year, y = freq, colour = as.factor(content), group = as.factor(content))) +
+  
+  scale_x_continuous(name = "Year", expand = c(0,0.2), breaks = c(seq(1984,1994,2))) + 
+  scale_y_continuous(name = "Frequency of present capelin", expand = c(0,0)) + 
+  scale_colour_discrete(name = "Stomach content") + 
+
+  facet_wrap(vars(alt.name, season), scales = "free_y", nrow = 3) +
+  theme_bw() +
+  theme(panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(),
+        panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
+        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
+        legend.text = element_text(size = 13), legend.title = element_text(size = 14))
+
+ggsave(filename = "engcalltofull.tiff", device = "tiff", plot = last_plot(), path = "./Figures",
+       dpi = 300, width = 16, height = 14, units = "in")
+
+```
+
+## Campelen
+
+```{r, fig.width=16,fig.height=14}
+
+# load rstrap set data
+load(file = "./Data/setdet.rda") 
+setdet <- setdet %>% mutate(v.t.s = paste(vessel,trip,set, sep = ".")) %>% 
+  filter(spec == "889"|spec == "438"|spec == "892") %>%
+  mutate(lat_dd = as.numeric(format(trimws(lat.start), digits = 5)),
+         long_dd = as.numeric(format(trimws(long.start), digits = 5)))
+
+
+# Trawl data
+camp_fall <- read.csv("./Data/camp_capelin_2J3KL_FULL.csv") %>% rename(year = YEAR, trawl_pa = Capelin_PA) %>% 
+  mutate(v.t.s = paste(VESSEL,TRIP,SET, sep = "."),
+         season = ifelse(MONTH == 3|MONTH == 4|MONTH == 5|MONTH == 6|MONTH == 7, "spring", "fall"))
+camp_fall <- left_join(camp_fall, 
+                       setdet %>% select(v.t.s, set.depth.max, data.series, bot.temp), by = c("v.t.s"), multiple = "any")
+camp_fall <- camp_fall %>% filter(data.series == "Campelen" & 
+                                    season == "fall"& 
+                                    is.na(bot.temp) == FALSE) %>%
+  mutate(lat_dd = as.numeric(trimws(lat_dd)),
+         long_dd = as.numeric(trimws(long_dd))) %>%
+filter(year <= 2020)
+  
+
+# Called stomach data
+load(file = "./Data/ag.rda")
+
+call_fall <- ag %>% select(-c(source.file, oedge:gutremvol)) %>%  
+  filter((spec == "889" | spec == "438" | spec == "892") & 
+           (NAFOdiv == "2J" | NAFOdiv == "3K" |NAFOdiv == "3L") &
+           which.survey == "multispecies") %>% 
+  mutate(v.t.s = paste(vessel, trip, set, sep = "."),
+         alt.name = spec,
+         alt.name = ifelse(alt.name == "889", "American plaice", alt.name),
+         alt.name = ifelse(alt.name == "438", "Atlantic cod", alt.name),
+         alt.name = ifelse(alt.name == "892", "Greenland halibut", alt.name),
+         pa = ifelse(prey1 == "Capelin"|prey2 == "Capelin", 1, 0), 
+         content = rep("called", length(data.series)),
+         season = ifelse(month == 3|month == 4|month == 5|month == 6|month == 7, "spring", "fall"))
+call_fall <- left_join(call_fall, 
+                       setdet %>% select(v.t.s, lat_dd, long_dd, set.depth.max, bot.temp), by = c("v.t.s"), multiple = "any")
+call_fall <- call_fall %>%
+  filter(data.series == "Campelen" & 
+           is.na(length) == FALSE & 
+           is.na(empty) == FALSE & 
+           is.na(bot.temp) == FALSE)
+
+# Full stomach data
+full_fall <- read.csv("./Data/NAFC_diet_capelin_COD_TURBOT_PLAICE_2J3KL.csv") %>% mutate(v.t.s = paste(VESSEL,TRIP,SET, sep = "."))
+full_fall <- left_join(full_fall, 
+                      setdet %>% select(v.t.s, set.depth.max, data.series, bot.temp), by = c("v.t.s"), multiple = "any")
+full_fall <- full_fall %>% mutate(alt.name = PRED_COMM_NAME,
+                                alt.name = ifelse(alt.name == "AMERICAN PLAICE", "American plaice", alt.name),
+                                alt.name = ifelse(alt.name == "COD,ATLANTIC", "Atlantic cod", alt.name),
+                                alt.name = ifelse(alt.name == "TURBOT", "Greenland halibut", alt.name),
+                                pa = ifelse(PREY_CAP == "Capelin", 1, 0),
+                                empty = ifelse(PREY_CAP == "Empty", TRUE, FALSE),
+                                content = rep("full", length(PRED_COMM_NAME)),
+                                SEASON = ifelse(MONTH == 3|MONTH == 4|MONTH == 5|MONTH == 6|MONTH == 7, "spring", "fall")) %>% 
+  rename(year = YEAR, month = MONTH, length = LENGTH, NAFOdiv = NAFO, season = SEASON) %>%
+  filter(data.series == "Campelen" & 
+           length < 400 & 
+           is.na(length) == FALSE & 
+           is.na(bot.temp) == FALSE)
+
+
+ratiod <- data.frame(content = c(call_fall$content, full_fall$content), 
+                     pa = c(call_fall$pa, full_fall$pa), 
+                     year = c(call_fall$year, full_fall$year),
+                     alt.name = c(call_fall$alt.name, full_fall$alt.name),
+                     season = c(call_fall$season, full_fall$season))
+ratiod <- ratiod %>% filter(year > 1994)
+
+
+avvspp <- ratiod %>% count(content, year, pa, alt.name, season) %>% group_by(content, year, alt.name, season) %>% mutate(freq = n/sum(n))
+
+only1s <- subset(avvspp, pa == 1)
+only1s$freq <- as.numeric(only1s$freq)
+
+
+
+# Create a blank data frame representing all years 
+blank <- data.frame(content = c(rep("called", 156),rep("full", 156)),
+           year = rep(rep(seq(1995,2020),6), 2),
+           pa = rep(1, 312),
+           alt.name = rep(c(rep("American plaice", 26), rep("Atlantic cod", 26), rep("Greenland halibut", 26)), 2),
+           season = rep(c(rep("spring", 78), rep("fall", 78)), 2),
+           n = rep(NA, 312),
+           freq = rep(NA, 312)
+)
+
+# Add observations from initial data.frame while retaining NAs
+for(i in 1:nrow(blank)){
+  for(j in 1:nrow(only1s)){
+    
+    if(only1s[j,1] == blank[i,1] & only1s[j,2] == blank[i,2] & only1s[j,4] == blank[i,4] & only1s[j,5] == blank[i,5]){
+      blank[i,6] = only1s[j,6]
+      blank[i,7] = only1s[j,7]
+    }
+    
+  }
+}
+
+
+# Format blank data.frame for nice figure
+blank <- blank %>% mutate(season = ifelse(season == "fall", "Fall", "Spring"),
+                          content = ifelse(content == "called", "Called", "Full"))
+
+
+ggplot(blank) +
+  geom_line(aes(x = year, y = freq, colour = as.factor(content), group = as.factor(content))) +
+  geom_point(aes(x = year, y = freq, colour = as.factor(content), group = as.factor(content))) +
+  
+  scale_x_continuous(name = "Year", expand = c(0,0.2), breaks = c(seq(1995, 2022, 5))) + 
+  scale_y_continuous(name = "Frequency of present capelin", expand = c(0,0)) + 
+  scale_colour_discrete(name = "Stomach content") + 
+  
+  facet_wrap(vars(alt.name, season), scales = "free_y", nrow = 3) +
+  theme_bw() +
+  theme(panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(),
+        panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
+        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
+        legend.text = element_text(size = 13), legend.title = element_text(size = 14))
+
+ggsave(filename = "campcalltofull.tiff", device = "tiff", plot = last_plot(), path = "./Figures",
+       dpi = 300, width = 16, height = 14, units = "in")
+
+```
+
+# Predator feeding ranges
+
+## Spring Engel
+
+```{r}
+source("./Analysis/Engel/Spring/SprEng-SetUp.R")
+
+pTSE <- ggplot(stom_spr_good) +
+  geom_boxplot(aes(x = alt.name, y = bot.temp)) +
+  
+  scale_x_discrete(name = "Predator species") +
+  scale_y_continuous(name = "Bottom temperature (°C)", limits = c(min(stom_spr_good$bot.temp)-0.1, max(stom_spr_good$bot.temp)+0.1)) +
+  
+  theme_classic() +
+  theme(axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), axis.title.x = element_blank(),
+        legend.text = element_text(size = 13), legend.title = element_text(size = 14)
+  )
+
+```
+
+## Fall Engel
+
+```{r}
+source("./Analysis/Engel/Fall/FallEng-SetUp.R")
+
+pTFE <- ggplot(stom_fall_good) +
+  geom_boxplot(aes(x = alt.name, y = bot.temp)) +
+  
+  scale_x_discrete(name = "Predator species") +
+  scale_y_continuous(name = "Bottom temperature (°C)", limits = c(min(stom_fall_good$bot.temp)-0.1, max(stom_fall_good$bot.temp)+0.1)) +
+  
+  theme_classic() +
+  theme(axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
+        legend.text = element_text(size = 13), legend.title = element_text(size = 14)
+  )
+        
+```
+
+## Spring Campelen
+
+```{r}
+source("./Analysis/Campelen/Spring/SprCamp-SetUp.R")
+
+pTSC <- ggplot(stom_spr_good) +
+  geom_boxplot(aes(x = alt.name, y = bot.temp)) +
+  
+  scale_x_discrete(name = "Predator species") +
+  scale_y_continuous(name = "Bottom temperature (°C)", limits = c(min(stom_spr_good$bot.temp)-0.1, max(stom_spr_good$bot.temp)+0.1)) +
+  
+  theme_classic() +
+  theme(axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
+        axis.title.x = element_blank(), axis.title.y = element_blank(),
+        legend.text = element_text(size = 13), legend.title = element_text(size = 14)
+  )
+
+```
+
+## Fall Campelen
+
+```{r}
+source("./Analysis/Campelen/Fall/FallCamp-SetUp.R")
+
+pTFC <- ggplot(stom_fall_good) +
+  geom_boxplot(aes(x = alt.name, y = bot.temp)) +
+  
+  scale_x_discrete(name = "Predator species") +
+  scale_y_continuous(name = "Bottom temperature (°C)", limits = c(min(stom_fall_good$bot.temp)-0.1, max(stom_fall_good$bot.temp)+0.1)) +
+  
+  theme_classic() +
+  theme(axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), axis.title.y = element_blank(),
+        legend.text = element_text(size = 13), legend.title = element_text(size = 14)
+  )
+
+```
+## - Figure 5
+```{r, fig.width=10.5, fig.height=8}
+ggpubr::ggarrange(pTSE+ggtitle("Engel\na) 3L Spring")+theme(plot.title = element_text(face = "bold")),
+                  pTSC+ggtitle("Campelen\nb) 3L Spring")+theme(plot.title = element_text(face = "bold")),
+                  pTFE+ggtitle("c) 2J3KL Fall")+theme(plot.title = element_text(face = "bold")),
+                  pTFC+ggtitle("d) 2J3KL Fall")+theme(plot.title = element_text(face = "bold"))
+  
+)
+
+ggsave(filename = "tempranges.tiff", device = "tiff", plot = last_plot(), path = "./Figures",
+       dpi = 300, width = 10.5, height = 8, units = "in")
+
+```
+
+# Additional
+## Mean sizes of fish within size categories across years?
+
+```{r}
+source("./Analysis/Campelen/Fall/FallCamp-SetUp.R")
+# Set up different length bins
+ac0c <- AC_stof %>% filter(length <= 17)
+ac1c <- AC_stof %>% filter(length > 17 & length <= 45)
+ac2c <- AC_stof %>% filter(length > 45) %>% filter(year != 1994)
+ap0c <- AP_stof %>% filter(length <= 29)
+ap1c <- AP_stof %>% filter(length > 29)
+gh0c <- GH_stof %>% filter(length <= 19)
+gh1c <- GH_stof %>% filter(length > 19 & length <= 40)
+gh2c <- GH_stof %>% filter(length > 40)
+
+source("./Analysis/Engel/Fall/FallEng-SetUp.R")
+# Set up different length bins
+ac0e <- AC_stof %>% filter(length <= 17)
+ac1e <- AC_stof %>% filter(length > 17 & length <= 45)
+ac2e <- AC_stof %>% filter(length > 45) %>% filter(year != 1994)
+ap0e <- AP_stof %>% filter(length <= 29)
+ap1e <- AP_stof %>% filter(length > 29)
+gh0e <- GH_stof %>% filter(length <= 19)
+gh1e <- GH_stof %>% filter(length > 19 & length <= 40)
+gh2e <- GH_stof %>% filter(length > 40)
+
+
+data.frame("lenbin" = c("ac0","ac1","ac2", "ap0","ap1", "gh0","gh1","gh2"),
+           "engel" = c(mean(ac0e$length), mean(ac1e$length),mean(ac2e$length),
+                          mean(ap0e$length), mean(ap1e$length),
+                          mean(gh0e$length), mean(gh1e$length), mean(gh2e$length)),
+           "campelen" = c(mean(ac0c$length), mean(ac1c$length),mean(ac2c$length),
+                          mean(ap0c$length), mean(ap1c$length),
+                          mean(gh0c$length), mean(gh1c$length), mean(gh2c$length)))
+
+
+data.frame("lenbin" = c("ac0","ac1","ac2", "ap0","ap1", "gh0","gh1","gh2"),
+           "engel" = c(median(ac0e$length), median(ac1e$length),median(ac2e$length),
+                          median(ap0e$length), median(ap1e$length),
+                          median(gh0e$length), median(gh1e$length), median(gh2e$length)),
+           "campelen" = c(median(ac0c$length), median(ac1c$length),median(ac2c$length),
+                          median(ap0c$length), median(ap1c$length),
+                          median(gh0c$length), median(gh1c$length), median(gh2c$length)))
+
+
+```
