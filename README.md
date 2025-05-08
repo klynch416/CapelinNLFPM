@@ -9,7 +9,9 @@ Author - [Kerri E. Lynch](Kerri.Lynch@mi.mun.ca), Marine Institute of Memorial U
 
 # Summary
 
-This code accompanies Lynch et al. (Submitted) where 
+This code accompanies Lynch et al. (Submitted), where we estimated an abundance index for capelin in the Northwest Atlantic between 1984 - 2020.
+
+<img src="./Figures/Methods.png"/>
 
 # Code purpose and order
 
