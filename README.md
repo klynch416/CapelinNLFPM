@@ -1,7 +1,7 @@
 # Comparing capelin abundance estimates from predator diet data and an acoustic survey
 
 # Citation
-Lynch, K.E. 2025. Comparing capelin abundance estimates from predator diet data and an acoustic survey: Zenodo code release. <https://doi.org/10.5281/zenodo.15367394>.
+Lynch, K.E. 2025. Comparing capelin abundance estimates from predator diet data and an acoustic survey: Zenodo code release. [![DOI](https://zenodo.org/badge/877415676.svg)](https://doi.org/10.5281/zenodo.15367394).
 
 # Contact
 
