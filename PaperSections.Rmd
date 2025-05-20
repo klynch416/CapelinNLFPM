@@ -28,7 +28,7 @@ Lsubpoly <- poly %>% filter(Division == "3L")
 acsurv <- read_sf("C:/Users/klynch/OneDrive - Marine Institute of Memorial University (1)/Thesis/Manu_1/Code/Chap1/Data/Survey_Area/general_survey_area.shp")
 
 ```
-## - Figure 2
+## - Figure 1
 ```{r, fig.width=5, fig.height=5}
 load("./Data/nlbasemap.RData")
 
@@ -102,6 +102,260 @@ p2 <- ggplot(data = camp_ac_surv) +
         axis.line.x = element_line(size = 0.5), 
         axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
         plot.title = element_text(size = 16, face = "bold"))
+```
+
+# Sample size
+
+## Engel
+
+### Spring
+```{r}
+load(file = "./ModelSaves/Set_Up/SE-1995.RData")
+
+Eacs1 <- AC_stos %>% filter(length > 17 & length <= 45) %>% filter(year != 1995)
+Eacs2 <- AC_stos %>% filter(length > 45) %>% filter(year != 1995)
+Eghs1 <- GH_stos %>% filter(length > 19 & length <= 40)
+Eghs2 <- GH_stos %>% filter(length > 40)
+Eaps1 <- AP_stos %>% filter(length > 29)
+
+Eacs0 <- AC_stos %>% filter(length < 18) %>% filter(year == 1982)
+Eghs0 <- GH_stos %>% filter(length < 20) %>% filter(year != 1984)
+Eaps0 <- AP_stos %>% filter(length < 30) %>% filter(year != 1984)
+
+```
+
+### Fall
+```{r}
+load(file = "./ModelSaves/Set_Up/FE-1994.RData")
+
+Eacf1 <- AC_stof %>% filter(length > 17 & length <= 45)
+Eacf2 <- AC_stof %>% filter(length > 45) %>% filter(year != 1994)
+Eghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
+Eghf2 <- GH_stof %>% filter(length > 40)
+Eapf1 <- AP_stof %>% filter(length > 29)
+
+Eacf0 <- AC_stof %>% filter(length < 18) %>% filter(year == 1988)
+Eghf0 <- GH_stof %>% filter(length < 20)
+Eapf0 <- AP_stof %>% filter(length < 30)
+
+```
+
+### Total
+```{r}
+Eac0 <- rbind(Eacs0, Eacf0) %>% mutate(alt.name = "Atlantic cod")
+Eac1 <- rbind(Eacs1, Eacf1) %>% mutate(alt.name = "Atlantic cod")
+Eac2 <- rbind(Eacs2, Eacf2) %>% mutate(alt.name = "Atlantic cod")
+Eap0 <- rbind(Eaps0, Eapf0) %>% mutate(alt.name = "American plaice")
+Eap1 <- rbind(Eaps1, Eapf1) %>% mutate(alt.name = "American plaice")
+Egh0 <- rbind(Eghs0, Eghf0) %>% mutate(alt.name = "Greenland halibut")
+Egh1 <- rbind(Eghs1, Eghf1) %>% mutate(alt.name = "Greenland halibut")
+Egh2 <- rbind(Eghs2, Eghf2) %>% mutate(alt.name = "Greenland halibut")
+
+```
+
+
+## Campelen
+
+### Spring
+```{r}
+load(file = "./ModelSaves/Set_Up/SC-2019.RData")
+
+Cacs1 <- AC_stos %>% filter(length > 17 & length <= 45) %>% filter(year != 1998 & year != 2017)
+Cacs2 <- AC_stos %>% filter(length > 45) %>% filter(year != 2015)
+Cghs1 <- GH_stos %>% filter(length > 19 & length <= 40) %>% filter(year != 2017)
+Cghs2 <- GH_stos %>% filter(length > 40)
+Caps1 <- AP_stos %>% filter(length > 29) %>% filter(year != 2017)
+
+Cacs0 <- AC_stos %>% filter(length < 18) %>% filter(year != 1996 & year != 1998 & year != 1999 & year != 2006 & year != 2011 & year != 2017)
+Cghs0 <- GH_stos %>% filter(length < 20) %>% filter(year != 2015 & year != 2017)
+Caps0 <- AP_stos %>% filter(length < 30) %>% filter(year != 2017)
+
+```
+
+### Fall
+```{r}
+# load rstrap set data
+load(file = "./ModelSaves/Set_Up/FC-2020.RData")
+
+Cacf1 <- AC_stof %>% filter(length > 17 & length <= 45)
+Cacf2 <- AC_stof %>% filter(length > 45) %>% filter(year != 1995)
+Cghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
+Cghf2 <- GH_stof %>% filter(length > 40)
+Capf1 <- AP_stof %>% filter(length > 29) %>% filter(year != 2014)
+
+Cacf0 <- AC_stof %>% filter(length < 18) %>% filter(year != 2011 & year != 2020)
+Cghf0 <- GH_stof %>% filter(length < 20)
+Capf0 <- AP_stof %>% filter(length < 30) %>% filter(year != 2014)
+
+```
+
+### Total
+```{r}
+
+Cac0 <- rbind(Cacs0, Cacf0) %>% mutate(alt.name = "Atlantic cod")
+Cac1 <- rbind(Cacs1, Cacf1) %>% mutate(alt.name = "Atlantic cod")
+Cac2 <- rbind(Cacs2, Cacf2) %>% mutate(alt.name = "Atlantic cod")
+Cap0 <- rbind(Caps0, Capf0) %>% mutate(alt.name = "American plaice")
+Cap1 <- rbind(Caps1, Capf1) %>% mutate(alt.name = "American plaice")
+Cgh0 <- rbind(Cghs0, Cghf0) %>% mutate(alt.name = "Greenland halibut")
+Cgh1 <- rbind(Cghs1, Cghf1) %>% mutate(alt.name = "Greenland halibut")
+Cgh2 <- rbind(Cghs2, Cghf2) %>% mutate(alt.name = "Greenland halibut")
+
+```
+
+
+## All data
+```{r}
+# Combine seasonal data for
+## Engel
+Eac0 <- rbind(Eacs0, Eacf0) %>% mutate(alt.name = "Atlantic cod")
+Eac1 <- rbind(Eacs1, Eacf1) %>% mutate(alt.name = "Atlantic cod")
+Eac2 <- rbind(Eacs2, Eacf2) %>% mutate(alt.name = "Atlantic cod")
+
+Eap0 <- rbind(Eaps0, Eapf0) %>% mutate(alt.name = "American plaice")
+Eap1 <- rbind(Eaps1, Eapf1) %>% mutate(alt.name = "American plaice")
+
+Egh0 <- rbind(Eghs0, Eghf0) %>% mutate(alt.name = "Greenland halibut")
+Egh1 <- rbind(Eghs1, Eghf1) %>% mutate(alt.name = "Greenland halibut")
+Egh2 <- rbind(Eghs2, Eghf2) %>% mutate(alt.name = "Greenland halibut")
+
+## Campelen
+Cac0 <- rbind(Cacs0, Cacf0) %>% mutate(alt.name = "Atlantic cod")
+Cac1 <- rbind(Cacs1, Cacf1) %>% mutate(alt.name = "Atlantic cod")
+Cac2 <- rbind(Cacs2, Cacf2) %>% mutate(alt.name = "Atlantic cod")
+
+Cap0 <- rbind(Caps0, Capf0) %>% mutate(alt.name = "American plaice")
+Cap1 <- rbind(Caps1, Capf1) %>% mutate(alt.name = "American plaice")
+
+Cgh0 <- rbind(Cghs0, Cghf0) %>% mutate(alt.name = "Greenland halibut")
+Cgh1 <- rbind(Cghs1, Cghf1) %>% mutate(alt.name = "Greenland halibut")
+Cgh2 <- rbind(Cghs2, Cghf2) %>% mutate(alt.name = "Greenland halibut")
+
+
+
+# Combine species data from the Engel and Campelen timeseries
+Tac0 <- rbind(Eac0, Cac0)
+Tac1 <- rbind(Eac1, Cac1)
+Tac2 <- rbind(Eac2, Cac2)
+
+Tap0 <- rbind(Eap0, Cap0)
+Tap1 <- rbind(Eap1, Cap1)
+
+Tgh0 <- rbind(Egh0, Cgh0)
+Tgh1 <- rbind(Egh1, Cgh1)
+Tgh2 <- rbind(Egh2, Cgh2)
+
+```
+
+## - Table 1
+```{r}
+
+sample_size <- data.frame(
+  E.C.Spr = c(nrow(filter(Tac0, geartype == "engel" & season == "spring" & content == "called")),
+              nrow(filter(Tac1, geartype == "engel" & season == "spring" & content == "called")),
+              nrow(filter(Tac2, geartype == "engel" & season == "spring" & content == "called")),
+              nrow(filter(Tgh0, geartype == "engel" & season == "spring" & content == "called")),
+              nrow(filter(Tgh1, geartype == "engel" & season == "spring" & content == "called")),
+              nrow(filter(Tgh2, geartype == "engel" & season == "spring" & content == "called")),
+              nrow(filter(Tap0, geartype == "engel" & season == "spring" & content == "called")),
+              nrow(filter(Tap1, geartype == "engel" & season == "spring" & content == "called"))),
+  E.C.Fall = c(nrow(filter(Tac0, geartype == "engel" & season == "fall" & content == "called")),
+               nrow(filter(Tac1, geartype == "engel" & season == "fall" & content == "called")),
+               nrow(filter(Tac2, geartype == "engel" & season == "fall" & content == "called")),
+               nrow(filter(Tgh0, geartype == "engel" & season == "fall" & content == "called")),
+               nrow(filter(Tgh1, geartype == "engel" & season == "fall" & content == "called")),
+               nrow(filter(Tgh2, geartype == "engel" & season == "fall" & content == "called")),
+               nrow(filter(Tap0, geartype == "engel" & season == "fall" & content == "called")),
+               nrow(filter(Tap1, geartype == "engel" & season == "fall" & content == "called"))),
+  E.F.Spr = c(nrow(filter(Tac0, geartype == "engel" & season == "spring" & content == "full")),
+              nrow(filter(Tac1, geartype == "engel" & season == "spring" & content == "full")),
+              nrow(filter(Tac2, geartype == "engel" & season == "spring" & content == "full")),
+              nrow(filter(Tgh0, geartype == "engel" & season == "spring" & content == "full")),
+              nrow(filter(Tgh1, geartype == "engel" & season == "spring" & content == "full")),
+              nrow(filter(Tgh2, geartype == "engel" & season == "spring" & content == "full")),
+              nrow(filter(Tap0, geartype == "engel" & season == "spring" & content == "full")),
+              nrow(filter(Tap1, geartype == "engel" & season == "spring" & content == "full"))),
+  E.F.Fall = c(nrow(filter(Tac0, geartype == "engel" & season == "fall" & content == "full")),
+               nrow(filter(Tac1, geartype == "engel" & season == "fall" & content == "full")),
+               nrow(filter(Tac2, geartype == "engel" & season == "fall" & content == "full")),
+               nrow(filter(Tgh0, geartype == "engel" & season == "fall" & content == "full")),
+               nrow(filter(Tgh1, geartype == "engel" & season == "fall" & content == "full")),
+               nrow(filter(Tgh2, geartype == "engel" & season == "fall" & content == "full")),
+               nrow(filter(Tap0, geartype == "engel" & season == "fall" & content == "full")),
+               nrow(filter(Tap1, geartype == "engel" & season == "fall" & content == "full"))),
+  E.pcapelin =  c(nrow(filter(Tac0, geartype == "engel" & pa == "0"))/nrow(filter(Tac0, geartype == "engel"))*100,
+                  nrow(filter(Tac1, geartype == "engel" & pa == "0"))/nrow(filter(Tac1, geartype == "engel"))*100,
+                  nrow(filter(Tac2, geartype == "engel" & pa == "0"))/nrow(filter(Tac2, geartype == "engel"))*100,
+                  nrow(filter(Tgh0, geartype == "engel" & pa == "0"))/nrow(filter(Tgh0, geartype == "engel"))*100,
+                  nrow(filter(Tgh1, geartype == "engel" & pa == "0"))/nrow(filter(Tgh1, geartype == "engel"))*100,
+                  nrow(filter(Tgh2, geartype == "engel" & pa == "0"))/nrow(filter(Tgh2, geartype == "engel"))*100,
+                  nrow(filter(Tap0, geartype == "engel" & pa == "0"))/nrow(filter(Tap0, geartype == "engel"))*100,
+                  nrow(filter(Tap1, geartype == "engel" & pa == "0"))/nrow(filter(Tap1, geartype == "engel"))*100),
+  E.pempty =  c(nrow(filter(Tac0, geartype == "engel" & empty == TRUE))/nrow(filter(Tac0, geartype == "engel"))*100,
+                nrow(filter(Tac1, geartype == "engel" & empty == TRUE))/nrow(filter(Tac1, geartype == "engel"))*100,
+                nrow(filter(Tac2, geartype == "engel" & empty == TRUE))/nrow(filter(Tac2, geartype == "engel"))*100,
+                nrow(filter(Tgh0, geartype == "engel" & empty == TRUE))/nrow(filter(Tgh0, geartype == "engel"))*100,
+                nrow(filter(Tgh1, geartype == "engel" & empty == TRUE))/nrow(filter(Tgh1, geartype == "engel"))*100,
+                nrow(filter(Tgh2, geartype == "engel" & empty == TRUE))/nrow(filter(Tgh2, geartype == "engel"))*100,
+                nrow(filter(Tap0, geartype == "engel" & empty == TRUE))/nrow(filter(Tap0, geartype == "engel"))*100,
+                nrow(filter(Tap1, geartype == "engel" & empty == TRUE))/nrow(filter(Tap1, geartype == "engel"))*100),
+  
+  C.C.Spr = c(nrow(filter(Tac0, geartype == "campelen" & season == "spring" & content == "called")),
+              nrow(filter(Tac1, geartype == "campelen" & season == "spring" & content == "called")),
+              nrow(filter(Tac2, geartype == "campelen" & season == "spring" & content == "called")),
+              nrow(filter(Tgh0, geartype == "campelen" & season == "spring" & content == "called")),
+              nrow(filter(Tgh1, geartype == "campelen" & season == "spring" & content == "called")),
+              nrow(filter(Tgh2, geartype == "campelen" & season == "spring" & content == "called")),
+              nrow(filter(Tap0, geartype == "campelen" & season == "spring" & content == "called")),
+              nrow(filter(Tap1, geartype == "campelen" & season == "spring" & content == "called"))),
+  C.C.Fall = c(nrow(filter(Tac0, geartype == "campelen" & season == "fall" & content == "called")),
+               nrow(filter(Tac1, geartype == "campelen" & season == "fall" & content == "called")),
+               nrow(filter(Tac2, geartype == "campelen" & season == "fall" & content == "called")),
+               nrow(filter(Tgh0, geartype == "campelen" & season == "fall" & content == "called")),
+               nrow(filter(Tgh1, geartype == "campelen" & season == "fall" & content == "called")),
+               nrow(filter(Tgh2, geartype == "campelen" & season == "fall" & content == "called")),
+               nrow(filter(Tap0, geartype == "campelen" & season == "fall" & content == "called")),
+               nrow(filter(Tap1, geartype == "campelen" & season == "fall" & content == "called"))),
+  C.F.Spr = c(nrow(filter(Tac0, geartype == "campelen" & season == "spring" & content == "full")),
+              nrow(filter(Tac1, geartype == "campelen" & season == "spring" & content == "full")),
+              nrow(filter(Tac2, geartype == "campelen" & season == "spring" & content == "full")),
+              nrow(filter(Tgh0, geartype == "campelen" & season == "spring" & content == "full")),
+              nrow(filter(Tgh1, geartype == "campelen" & season == "spring" & content == "full")),
+              nrow(filter(Tgh2, geartype == "campelen" & season == "spring" & content == "full")),
+              nrow(filter(Tap0, geartype == "campelen" & season == "spring" & content == "full")),
+              nrow(filter(Tap1, geartype == "campelen" & season == "spring" & content == "full"))),
+  C.F.Fall = c(nrow(filter(Tac0, geartype == "campelen" & season == "fall" & content == "full")),
+               nrow(filter(Tac1, geartype == "campelen" & season == "fall" & content == "full")),
+               nrow(filter(Tac2, geartype == "campelen" & season == "fall" & content == "full")),
+               nrow(filter(Tgh0, geartype == "campelen" & season == "fall" & content == "full")),
+               nrow(filter(Tgh1, geartype == "campelen" & season == "fall" & content == "full")),
+               nrow(filter(Tgh2, geartype == "campelen" & season == "fall" & content == "full")),
+               nrow(filter(Tap0, geartype == "campelen" & season == "fall" & content == "full")),
+               nrow(filter(Tap1, geartype == "campelen" & season == "fall" & content == "full"))),
+  C.pcapelin =  c(nrow(filter(Tac0, geartype == "campelen" & pa == "0"))/nrow(filter(Tac0, geartype == "campelen"))*100,
+                  nrow(filter(Tac1, geartype == "campelen" & pa == "0"))/nrow(filter(Tac1, geartype == "campelen"))*100,
+                  nrow(filter(Tac2, geartype == "campelen" & pa == "0"))/nrow(filter(Tac2, geartype == "campelen"))*100,
+                  nrow(filter(Tgh0, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh0, geartype == "campelen"))*100,
+                  nrow(filter(Tgh1, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh1, geartype == "campelen"))*100,
+                  nrow(filter(Tgh2, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh2, geartype == "campelen"))*100,
+                  nrow(filter(Tap0, geartype == "campelen" & pa == "0"))/nrow(filter(Tap0, geartype == "campelen"))*100,
+                  nrow(filter(Tap1, geartype == "campelen" & pa == "0"))/nrow(filter(Tap1, geartype == "campelen"))*100),
+  C.pempty = c(nrow(filter(Tac0, geartype == "campelen" & empty == TRUE))/nrow(filter(Tac0, geartype == "campelen"))*100,
+                nrow(filter(Tac1, geartype == "campelen" & empty == TRUE))/nrow(filter(Tac1, geartype == "campelen"))*100,
+                nrow(filter(Tac2, geartype == "campelen" & empty == TRUE))/nrow(filter(Tac2, geartype == "campelen"))*100,
+                nrow(filter(Tgh0, geartype == "campelen" & empty == TRUE))/nrow(filter(Tgh0, geartype == "campelen"))*100,
+                nrow(filter(Tgh1, geartype == "campelen" & empty == TRUE))/nrow(filter(Tgh1, geartype == "campelen"))*100,
+                nrow(filter(Tgh2, geartype == "campelen" & empty == TRUE))/nrow(filter(Tgh2, geartype == "campelen"))*100,
+                nrow(filter(Tap0, geartype == "campelen" & empty == TRUE))/nrow(filter(Tap0, geartype == "campelen"))*100,
+                nrow(filter(Tap1, geartype == "campelen" & empty == TRUE))/nrow(filter(Tap1, geartype == "campelen"))*100)
+
+)
+
+sample_size <- sample_size %>% mutate(E.pcapelin = format(E.pcapelin, digits = 4), C.pcapelin = format(C.pcapelin, digits = 4),
+                                      E.pempty = format(E.pempty, digits = 4), C.pempty = format(C.pempty, digits = 4))
+
+write.csv(x = sample_size, file = "./Figures/samplesize.csv")
+
 ```
 
 ## Engel
