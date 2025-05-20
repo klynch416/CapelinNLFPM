@@ -182,39 +182,40 @@ ggsave(filename = "datamaps.tiff", device = "tiff", plot = pmaps, path = "./Figu
 
 ## Engel
 
-### Spring
+ ### Spring
 ```{r}
 load(file = "./ModelSaves/Set_Up/SE-1995.RData")
 
 acs1 <- AC_stos %>% filter(length > 17 & length <= 45)
 acs2 <- AC_stos %>% filter(length > 45)
-aps1 <- AP_stos %>% filter(length > 29)
 ghs1 <- GH_stos %>% filter(length > 19 & length <= 40)
 ghs2 <- GH_stos %>% filter(length > 40)
+aps1 <- AP_stos %>% filter(length > 29)
 
 acs0 <- AC_stos %>% filter(length < 18)
-aps0 <- AP_stos %>% filter(length < 30)
 ghs0 <- GH_stos %>% filter(length < 20)
+aps0 <- AP_stos %>% filter(length < 30)
 
 
-# table(acs0$pa, acs0$year)
-# table(acs1$pa, acs1$year)
-# table(acs2$pa, acs2$year)
-# table(aps0$pa, aps0$year)
-# table(aps1$pa, aps1$year)
-# table(ghs0$pa, ghs0$year)
-# table(ghs1$pa, ghs1$year)
-# table(ghs2$pa, ghs2$year)
+table(acs0$pa, acs0$year)
+table(acs1$pa, acs1$year)
+table(acs2$pa, acs2$year)
+table(ghs0$pa, ghs0$year)
+table(ghs1$pa, ghs1$year)
+table(ghs2$pa, ghs2$year)
+table(aps0$pa, aps0$year)
+table(aps1$pa, aps1$year)
+
 
 Eacs1 <- AC_stos %>% filter(length > 17 & length <= 45) %>% filter(year != 1995)
 Eacs2 <- AC_stos %>% filter(length > 45) %>% filter(year != 1995)
-Eaps1 <- AP_stos %>% filter(length > 29)
 Eghs1 <- GH_stos %>% filter(length > 19 & length <= 40)
 Eghs2 <- GH_stos %>% filter(length > 40)
+Eaps1 <- AP_stos %>% filter(length > 29)
 
 Eacs0 <- AC_stos %>% filter(length < 18) %>% filter(year == 1982)
-Eaps0 <- AP_stos %>% filter(length < 30) %>% filter(year != 1984)
 Eghs0 <- GH_stos %>% filter(length < 20) %>% filter(year != 1984)
+Eaps0 <- AP_stos %>% filter(length < 30) %>% filter(year != 1984)
 
 ```
 
@@ -224,32 +225,32 @@ load(file = "./ModelSaves/Set_Up/FE-1994.RData")
 
 acf1 <- AC_stof %>% filter(length > 17 & length <= 45)
 acf2 <- AC_stof %>% filter(length > 45)
-apf1 <- AP_stof %>% filter(length > 29)
 ghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
 ghf2 <- GH_stof %>% filter(length > 40)
+apf1 <- AP_stof %>% filter(length > 29)
 
 acf0 <- AC_stof %>% filter(length < 18)
-apf0 <- AP_stof %>% filter(length < 30)
 ghf0 <- GH_stof %>% filter(length < 20)
+apf0 <- AP_stof %>% filter(length < 30)
 
-# table(acf0$pa, acf0$year)
-# table(acf1$pa, acf1$year)
-# table(acf2$pa, acf2$year)
-# table(apf0$pa, apf0$year)
-# table(apf1$pa, apf1$year)
-# table(ghf0$pa, ghf0$year)
-# table(ghf1$pa, ghf1$year)
-# table(ghf2$pa, ghf2$year)
+table(acf0$pa, acf0$year)
+table(acf1$pa, acf1$year)
+table(acf2$pa, acf2$year)
+table(apf0$pa, apf0$year)
+table(apf1$pa, apf1$year)
+table(ghf0$pa, ghf0$year)
+table(ghf1$pa, ghf1$year)
+table(ghf2$pa, ghf2$year)
 
 Eacf1 <- AC_stof %>% filter(length > 17 & length <= 45)
 Eacf2 <- AC_stof %>% filter(length > 45) %>% filter(year != 1994)
-Eapf1 <- AP_stof %>% filter(length > 29)
 Eghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
 Eghf2 <- GH_stof %>% filter(length > 40)
+Eapf1 <- AP_stof %>% filter(length > 29)
 
-Eacf0 <- AC_stof %>% filter(length < 18) %>% filter(year == 1982 & year == 1983 & year == 1988)
-Eapf0 <- AP_stof %>% filter(length < 30)
+Eacf0 <- AC_stof %>% filter(length < 18) %>% filter(year == 1988)
 Eghf0 <- GH_stof %>% filter(length < 20)
+Eapf0 <- AP_stof %>% filter(length < 30)
 
 ```
 
@@ -285,33 +286,34 @@ load(file = "./ModelSaves/Set_Up/SC-2019.RData")
 
 acs1 <- AC_stos %>% filter(length > 17 & length <= 45)
 acs2 <- AC_stos %>% filter(length > 45)
-aps1 <- AP_stos %>% filter(length > 29)
 ghs1 <- GH_stos %>% filter(length > 19 & length <= 40)
 ghs2 <- GH_stos %>% filter(length > 40)
+aps1 <- AP_stos %>% filter(length > 29)
 
 acs0 <- AC_stos %>% filter(length < 18)
-aps0 <- AP_stos %>% filter(length < 30)
 ghs0 <- GH_stos %>% filter(length < 20)
+aps0 <- AP_stos %>% filter(length < 30)
 
 
-# table(acs0$pa, acs0$year)
-# table(acs1$pa, acs1$year)
-# table(acs2$pa, acs2$year)
-# table(aps0$pa, aps0$year)
-# table(aps1$pa, aps1$year)
-# table(ghs0$pa, ghs0$year)
-# table(ghs1$pa, ghs1$year)
-# table(ghs2$pa, ghs2$year)
+table(acs0$pa, acs0$year)
+table(acs1$pa, acs1$year)
+table(acs2$pa, acs2$year)
+table(ghs0$pa, ghs0$year)
+table(ghs1$pa, ghs1$year)
+table(ghs2$pa, ghs2$year)
+table(aps0$pa, aps0$year)
+table(aps1$pa, aps1$year)
+
 
 Cacs1 <- AC_stos %>% filter(length > 17 & length <= 45) %>% filter(year != 1998 & year != 2017)
 Cacs2 <- AC_stos %>% filter(length > 45) %>% filter(year != 2015)
-Caps1 <- AP_stos %>% filter(length > 29) %>% filter(year != 2017)
 Cghs1 <- GH_stos %>% filter(length > 19 & length <= 40) %>% filter(year != 2017)
 Cghs2 <- GH_stos %>% filter(length > 40)
+Caps1 <- AP_stos %>% filter(length > 29) %>% filter(year != 2017)
 
 Cacs0 <- AC_stos %>% filter(length < 18) %>% filter(year != 1996 & year != 1998 & year != 1999 & year != 2006 & year != 2011 & year != 2017)
-Caps0 <- AP_stos %>% filter(length < 30) %>% filter(year != 2017)
 Cghs0 <- GH_stos %>% filter(length < 20) %>% filter(year != 2015 & year != 2017)
+Caps0 <- AP_stos %>% filter(length < 30) %>% filter(year != 2017)
 
 ```
 
@@ -323,32 +325,32 @@ load(file = "./ModelSaves/Set_Up/FC-2020.RData")
 
 acf1 <- AC_stof %>% filter(length > 17 & length <= 45)
 acf2 <- AC_stof %>% filter(length > 45)
-apf1 <- AP_stof %>% filter(length > 29)
 ghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
 ghf2 <- GH_stof %>% filter(length > 40)
+apf1 <- AP_stof %>% filter(length > 29)
 
 acf0 <- AC_stof %>% filter(length < 18)
-apf0 <- AP_stof %>% filter(length < 30)
 ghf0 <- GH_stof %>% filter(length < 20)
+apf0 <- AP_stof %>% filter(length < 30)
 
-# table(acf0$pa, acf0$year)
-# table(acf1$pa, acf1$year)
-# table(acf2$pa, acf2$year)
-# table(apf0$pa, apf0$year)
-# table(apf1$pa, apf1$year)
-# table(ghf0$pa, ghf0$year)
-# table(ghf1$pa, ghf1$year)
-# table(ghf2$pa, ghf2$year)
+table(acf0$pa, acf0$year)
+table(acf1$pa, acf1$year)
+table(acf2$pa, acf2$year)
+table(apf0$pa, apf0$year)
+table(apf1$pa, apf1$year)
+table(ghf0$pa, ghf0$year)
+table(ghf1$pa, ghf1$year)
+table(ghf2$pa, ghf2$year)
 
 Cacf1 <- AC_stof %>% filter(length > 17 & length <= 45)
 Cacf2 <- AC_stof %>% filter(length > 45) %>% filter(year != 1995)
-Capf1 <- AP_stof %>% filter(length > 29) %>% filter(year != 2014)
 Cghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
 Cghf2 <- GH_stof %>% filter(length > 40)
+Capf1 <- AP_stof %>% filter(length > 29) %>% filter(year != 2014)
 
 Cacf0 <- AC_stof %>% filter(length < 18) %>% filter(year != 2011 & year != 2020)
-Capf0 <- AP_stof %>% filter(length < 30) %>% filter(year != 2014)
 Cghf0 <- GH_stof %>% filter(length < 20)
+Capf0 <- AP_stof %>% filter(length < 30) %>% filter(year != 2014)
 
 ```
 
@@ -436,7 +438,7 @@ ac <- data.frame(year = seq(1984,2020,1),
                  ac1_spring = c(dfac1$ac1_spring),
                  ac2_spring = c(dfac2$ac2_spring[1:11], 0, dfac2$ac2_spring[12:36]),
                  
-                 ac0_fall = c(rep(0,11), dfac0$ac0_fall[1:16], 0, dfac0$ac0_fall[17:24], rep(0,1)),
+                 ac0_fall = c(rep(0,4), dfac0$ac0_fall[1], rep(0,6), dfac0$ac0_fall[1:16], 0, dfac0$ac0_fall[17:24], rep(0,1)),
                  ac1_fall = c(dfac1$ac1_fall),
                  ac2_fall = c(dfac2$ac2_fall[1:11], 0, dfac2$ac2_fall[12:36]))
 write.csv(ac, file = "./Extra/acseason.csv")
@@ -499,14 +501,22 @@ sample_size <- data.frame(
                nrow(filter(Tgh2, geartype == "engel" & season == "fall" & content == "full")),
                nrow(filter(Tap0, geartype == "engel" & season == "fall" & content == "full")),
                nrow(filter(Tap1, geartype == "engel" & season == "fall" & content == "full"))),
-  E.pempty =  c(nrow(filter(Tac0, geartype == "engel" & pa == "0"))/nrow(filter(Tac0, geartype == "engel"))*100,
-                nrow(filter(Tac1, geartype == "engel" & pa == "0"))/nrow(filter(Tac1, geartype == "engel"))*100,
-                nrow(filter(Tac2, geartype == "engel" & pa == "0"))/nrow(filter(Tac2, geartype == "engel"))*100,
-                nrow(filter(Tgh0, geartype == "engel" & pa == "0"))/nrow(filter(Tgh0, geartype == "engel"))*100,
-                nrow(filter(Tgh1, geartype == "engel" & pa == "0"))/nrow(filter(Tgh1, geartype == "engel"))*100,
-                nrow(filter(Tgh2, geartype == "engel" & pa == "0"))/nrow(filter(Tgh2, geartype == "engel"))*100,
-                nrow(filter(Tap0, geartype == "engel" & pa == "0"))/nrow(filter(Tap0, geartype == "engel"))*100,
-                nrow(filter(Tap1, geartype == "engel" & pa == "0"))/nrow(filter(Tap1, geartype == "engel"))*100),
+  E.pcapelin =  c(nrow(filter(Tac0, geartype == "engel" & pa == "0"))/nrow(filter(Tac0, geartype == "engel"))*100,
+                  nrow(filter(Tac1, geartype == "engel" & pa == "0"))/nrow(filter(Tac1, geartype == "engel"))*100,
+                  nrow(filter(Tac2, geartype == "engel" & pa == "0"))/nrow(filter(Tac2, geartype == "engel"))*100,
+                  nrow(filter(Tgh0, geartype == "engel" & pa == "0"))/nrow(filter(Tgh0, geartype == "engel"))*100,
+                  nrow(filter(Tgh1, geartype == "engel" & pa == "0"))/nrow(filter(Tgh1, geartype == "engel"))*100,
+                  nrow(filter(Tgh2, geartype == "engel" & pa == "0"))/nrow(filter(Tgh2, geartype == "engel"))*100,
+                  nrow(filter(Tap0, geartype == "engel" & pa == "0"))/nrow(filter(Tap0, geartype == "engel"))*100,
+                  nrow(filter(Tap1, geartype == "engel" & pa == "0"))/nrow(filter(Tap1, geartype == "engel"))*100),
+  E.pempty =  c(nrow(filter(Tac0, geartype == "engel" & empty == TRUE))/nrow(filter(Tac0, geartype == "engel"))*100,
+                nrow(filter(Tac1, geartype == "engel" & empty == TRUE))/nrow(filter(Tac1, geartype == "engel"))*100,
+                nrow(filter(Tac2, geartype == "engel" & empty == TRUE))/nrow(filter(Tac2, geartype == "engel"))*100,
+                nrow(filter(Tgh0, geartype == "engel" & empty == TRUE))/nrow(filter(Tgh0, geartype == "engel"))*100,
+                nrow(filter(Tgh1, geartype == "engel" & empty == TRUE))/nrow(filter(Tgh1, geartype == "engel"))*100,
+                nrow(filter(Tgh2, geartype == "engel" & empty == TRUE))/nrow(filter(Tgh2, geartype == "engel"))*100,
+                nrow(filter(Tap0, geartype == "engel" & empty == TRUE))/nrow(filter(Tap0, geartype == "engel"))*100,
+                nrow(filter(Tap1, geartype == "engel" & empty == TRUE))/nrow(filter(Tap1, geartype == "engel"))*100),
   
   C.C.Spr = c(nrow(filter(Tac0, geartype == "campelen" & season == "spring" & content == "called")),
               nrow(filter(Tac1, geartype == "campelen" & season == "spring" & content == "called")),
@@ -540,20 +550,29 @@ sample_size <- data.frame(
                nrow(filter(Tgh2, geartype == "campelen" & season == "fall" & content == "full")),
                nrow(filter(Tap0, geartype == "campelen" & season == "fall" & content == "full")),
                nrow(filter(Tap1, geartype == "campelen" & season == "fall" & content == "full"))),
-  C.pempty =  c(nrow(filter(Tac0, geartype == "campelen" & pa == "0"))/nrow(filter(Tac0, geartype == "campelen"))*100,
-                nrow(filter(Tac1, geartype == "campelen" & pa == "0"))/nrow(filter(Tac1, geartype == "campelen"))*100,
-                nrow(filter(Tac2, geartype == "campelen" & pa == "0"))/nrow(filter(Tac2, geartype == "campelen"))*100,
-                nrow(filter(Tgh0, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh0, geartype == "campelen"))*100,
-                nrow(filter(Tgh1, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh1, geartype == "campelen"))*100,
-                nrow(filter(Tgh2, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh2, geartype == "campelen"))*100,
-                nrow(filter(Tap0, geartype == "campelen" & pa == "0"))/nrow(filter(Tap0, geartype == "campelen"))*100,
-                nrow(filter(Tap1, geartype == "campelen" & pa == "0"))/nrow(filter(Tap1, geartype == "campelen"))*100)
+  C.pcapelin =  c(nrow(filter(Tac0, geartype == "campelen" & pa == "0"))/nrow(filter(Tac0, geartype == "campelen"))*100,
+                  nrow(filter(Tac1, geartype == "campelen" & pa == "0"))/nrow(filter(Tac1, geartype == "campelen"))*100,
+                  nrow(filter(Tac2, geartype == "campelen" & pa == "0"))/nrow(filter(Tac2, geartype == "campelen"))*100,
+                  nrow(filter(Tgh0, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh0, geartype == "campelen"))*100,
+                  nrow(filter(Tgh1, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh1, geartype == "campelen"))*100,
+                  nrow(filter(Tgh2, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh2, geartype == "campelen"))*100,
+                  nrow(filter(Tap0, geartype == "campelen" & pa == "0"))/nrow(filter(Tap0, geartype == "campelen"))*100,
+                  nrow(filter(Tap1, geartype == "campelen" & pa == "0"))/nrow(filter(Tap1, geartype == "campelen"))*100),
+  C.pempty = c(nrow(filter(Tac0, geartype == "campelen" & empty == TRUE))/nrow(filter(Tac0, geartype == "campelen"))*100,
+                nrow(filter(Tac1, geartype == "campelen" & empty == TRUE))/nrow(filter(Tac1, geartype == "campelen"))*100,
+                nrow(filter(Tac2, geartype == "campelen" & empty == TRUE))/nrow(filter(Tac2, geartype == "campelen"))*100,
+                nrow(filter(Tgh0, geartype == "campelen" & empty == TRUE))/nrow(filter(Tgh0, geartype == "campelen"))*100,
+                nrow(filter(Tgh1, geartype == "campelen" & empty == TRUE))/nrow(filter(Tgh1, geartype == "campelen"))*100,
+                nrow(filter(Tgh2, geartype == "campelen" & empty == TRUE))/nrow(filter(Tgh2, geartype == "campelen"))*100,
+                nrow(filter(Tap0, geartype == "campelen" & empty == TRUE))/nrow(filter(Tap0, geartype == "campelen"))*100,
+                nrow(filter(Tap1, geartype == "campelen" & empty == TRUE))/nrow(filter(Tap1, geartype == "campelen"))*100)
 
 )
 
-sample_size <- sample_size %>% mutate(E.pempty = format(E.pempty, digits = 4), C.pempty = format(C.pempty, digits = 4))
+sample_size <- sample_size %>% mutate(E.pcapelin = format(E.pcapelin, digits = 4), C.pcapelin = format(C.pcapelin, digits = 4),
+                                      E.pempty = format(E.pempty, digits = 4), C.pempty = format(C.pempty, digits = 4))
 
-write.csv(x = sample_size, file = "./Extra/samplesize.csv")
+write.csv(x = sample_size, file = "./Extra/samplesize_16.05.25.csv")
 
 ```
 
