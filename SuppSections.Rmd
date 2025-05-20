@@ -186,36 +186,25 @@ ggsave(filename = "datamaps.tiff", device = "tiff", plot = pmaps, path = "./Figu
 ```{r}
 load(file = "./ModelSaves/Set_Up/SE-1995.RData")
 
-acs1 <- AC_stos %>% filter(length > 17 & length <= 45)
-acs2 <- AC_stos %>% filter(length > 45)
-ghs1 <- GH_stos %>% filter(length > 19 & length <= 40)
-ghs2 <- GH_stos %>% filter(length > 40)
-aps1 <- AP_stos %>% filter(length > 29)
-
-acs0 <- AC_stos %>% filter(length < 18)
-ghs0 <- GH_stos %>% filter(length < 20)
-aps0 <- AP_stos %>% filter(length < 30)
-
-
-table(acs0$pa, acs0$year)
-table(acs1$pa, acs1$year)
-table(acs2$pa, acs2$year)
-table(ghs0$pa, ghs0$year)
-table(ghs1$pa, ghs1$year)
-table(ghs2$pa, ghs2$year)
-table(aps0$pa, aps0$year)
-table(aps1$pa, aps1$year)
-
-
-Eacs1 <- AC_stos %>% filter(length > 17 & length <= 45) %>% filter(year != 1995)
-Eacs2 <- AC_stos %>% filter(length > 45) %>% filter(year != 1995)
+Eacs1 <- AC_stos %>% filter(length > 17 & length <= 45)
+Eacs2 <- AC_stos %>% filter(length > 45)
 Eghs1 <- GH_stos %>% filter(length > 19 & length <= 40)
 Eghs2 <- GH_stos %>% filter(length > 40)
 Eaps1 <- AP_stos %>% filter(length > 29)
 
-Eacs0 <- AC_stos %>% filter(length < 18) %>% filter(year == 1982)
-Eghs0 <- GH_stos %>% filter(length < 20) %>% filter(year != 1984)
-Eaps0 <- AP_stos %>% filter(length < 30) %>% filter(year != 1984)
+Eacs0 <- AC_stos %>% filter(length < 18)
+Eghs0 <- GH_stos %>% filter(length < 20)
+Eaps0 <- AP_stos %>% filter(length < 30)
+
+
+# table(Eacs0$pa, Eacs0$year)
+# table(Eacs1$pa, Eacs1$year)
+# table(Eacs2$pa, Eacs2$year)
+# table(Eghs0$pa, Eghs0$year)
+# table(Eghs1$pa, Eghs1$year)
+# table(Eghs2$pa, Eghs2$year)
+# table(Eaps0$pa, Eaps0$year)
+# table(Eaps1$pa, Eaps1$year)
 
 ```
 
@@ -223,47 +212,37 @@ Eaps0 <- AP_stos %>% filter(length < 30) %>% filter(year != 1984)
 ```{r}
 load(file = "./ModelSaves/Set_Up/FE-1994.RData")
 
-acf1 <- AC_stof %>% filter(length > 17 & length <= 45)
-acf2 <- AC_stof %>% filter(length > 45)
-ghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
-ghf2 <- GH_stof %>% filter(length > 40)
-apf1 <- AP_stof %>% filter(length > 29)
-
-acf0 <- AC_stof %>% filter(length < 18)
-ghf0 <- GH_stof %>% filter(length < 20)
-apf0 <- AP_stof %>% filter(length < 30)
-
-table(acf0$pa, acf0$year)
-table(acf1$pa, acf1$year)
-table(acf2$pa, acf2$year)
-table(apf0$pa, apf0$year)
-table(apf1$pa, apf1$year)
-table(ghf0$pa, ghf0$year)
-table(ghf1$pa, ghf1$year)
-table(ghf2$pa, ghf2$year)
-
 Eacf1 <- AC_stof %>% filter(length > 17 & length <= 45)
-Eacf2 <- AC_stof %>% filter(length > 45) %>% filter(year != 1994)
+Eacf2 <- AC_stof %>% filter(length > 45)
 Eghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
 Eghf2 <- GH_stof %>% filter(length > 40)
 Eapf1 <- AP_stof %>% filter(length > 29)
 
-Eacf0 <- AC_stof %>% filter(length < 18) %>% filter(year == 1988)
+Eacf0 <- AC_stof %>% filter(length < 18)
 Eghf0 <- GH_stof %>% filter(length < 20)
 Eapf0 <- AP_stof %>% filter(length < 30)
+
+# table(Eacf0$pa, Eacf0$year)
+# table(Eacf1$pa, Eacf1$year)
+# table(Eacf2$pa, Eacf2$year)
+# table(Eapf0$pa, Eapf0$year)
+# table(Eapf1$pa, Eapf1$year)
+# table(Eghf0$pa, Eghf0$year)
+# table(Eghf1$pa, Eghf1$year)
+# table(Eghf2$pa, Eghf2$year)
 
 ```
 
 ### Total
 ```{r}
-Eac0 <- rbind(acs0, acf0) %>% mutate(alt.name = "Atlantic cod")
-Eac1 <- rbind(acs1, acf1) %>% mutate(alt.name = "Atlantic cod")
-Eac2 <- rbind(acs2, acf2) %>% mutate(alt.name = "Atlantic cod")
-Eap0 <- rbind(aps0, apf0) %>% mutate(alt.name = "American plaice")
-Eap1 <- rbind(aps1, apf1) %>% mutate(alt.name = "American plaice")
-Egh0 <- rbind(ghs0, ghf0) %>% mutate(alt.name = "Greenland halibut")
-Egh1 <- rbind(ghs1, ghf1) %>% mutate(alt.name = "Greenland halibut")
-Egh2 <- rbind(ghs2, ghf2) %>% mutate(alt.name = "Greenland halibut")
+Eac0 <- rbind(Eacs0, Eacf0) %>% mutate(alt.name = "Atlantic cod")
+Eac1 <- rbind(Eacs1, Eacf1) %>% mutate(alt.name = "Atlantic cod")
+Eac2 <- rbind(Eacs2, Eacf2) %>% mutate(alt.name = "Atlantic cod")
+Eap0 <- rbind(Eaps0, Eapf0) %>% mutate(alt.name = "American plaice")
+Eap1 <- rbind(Eaps1, Eapf1) %>% mutate(alt.name = "American plaice")
+Egh0 <- rbind(Eghs0, Eghf0) %>% mutate(alt.name = "Greenland halibut")
+Egh1 <- rbind(Eghs1, Eghf1) %>% mutate(alt.name = "Greenland halibut")
+Egh2 <- rbind(Eghs2, Eghf2) %>% mutate(alt.name = "Greenland halibut")
 
 # table(Eac0$year, Eac0$season)
 # table(Eac1$year, Eac1$season)
@@ -284,36 +263,26 @@ Egh2 <- rbind(ghs2, ghf2) %>% mutate(alt.name = "Greenland halibut")
 load(file = "./ModelSaves/Set_Up/SC-2019.RData")
 
 
-acs1 <- AC_stos %>% filter(length > 17 & length <= 45)
-acs2 <- AC_stos %>% filter(length > 45)
-ghs1 <- GH_stos %>% filter(length > 19 & length <= 40)
-ghs2 <- GH_stos %>% filter(length > 40)
-aps1 <- AP_stos %>% filter(length > 29)
-
-acs0 <- AC_stos %>% filter(length < 18)
-ghs0 <- GH_stos %>% filter(length < 20)
-aps0 <- AP_stos %>% filter(length < 30)
-
-
-table(acs0$pa, acs0$year)
-table(acs1$pa, acs1$year)
-table(acs2$pa, acs2$year)
-table(ghs0$pa, ghs0$year)
-table(ghs1$pa, ghs1$year)
-table(ghs2$pa, ghs2$year)
-table(aps0$pa, aps0$year)
-table(aps1$pa, aps1$year)
-
-
-Cacs1 <- AC_stos %>% filter(length > 17 & length <= 45) %>% filter(year != 1998 & year != 2017)
-Cacs2 <- AC_stos %>% filter(length > 45) %>% filter(year != 2015)
-Cghs1 <- GH_stos %>% filter(length > 19 & length <= 40) %>% filter(year != 2017)
+Cacs1 <- AC_stos %>% filter(length > 17 & length <= 45)
+Cacs2 <- AC_stos %>% filter(length > 45)
+Cghs1 <- GH_stos %>% filter(length > 19 & length <= 40)
 Cghs2 <- GH_stos %>% filter(length > 40)
-Caps1 <- AP_stos %>% filter(length > 29) %>% filter(year != 2017)
+Caps1 <- AP_stos %>% filter(length > 29)
 
-Cacs0 <- AC_stos %>% filter(length < 18) %>% filter(year != 1996 & year != 1998 & year != 1999 & year != 2006 & year != 2011 & year != 2017)
-Cghs0 <- GH_stos %>% filter(length < 20) %>% filter(year != 2015 & year != 2017)
-Caps0 <- AP_stos %>% filter(length < 30) %>% filter(year != 2017)
+Cacs0 <- AC_stos %>% filter(length < 18)
+Cghs0 <- GH_stos %>% filter(length < 20)
+Caps0 <- AP_stos %>% filter(length < 30)
+
+
+
+# table(Cacs0$pa, Cacs0$year)
+# table(Cacs1$pa, Cacs1$year)
+# table(Cacs2$pa, Cacs2$year)
+# table(Cghs0$pa, Cghs0$year)
+# table(Cghs1$pa, Cghs1$year)
+# table(Cghs2$pa, Cghs2$year)
+# table(Caps0$pa, Caps0$year)
+# table(Caps1$pa, Caps1$year)
 
 ```
 
@@ -322,35 +291,25 @@ Caps0 <- AP_stos %>% filter(length < 30) %>% filter(year != 2017)
 # load rstrap set data
 load(file = "./ModelSaves/Set_Up/FC-2020.RData")
 
-
-acf1 <- AC_stof %>% filter(length > 17 & length <= 45)
-acf2 <- AC_stof %>% filter(length > 45)
-ghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
-ghf2 <- GH_stof %>% filter(length > 40)
-apf1 <- AP_stof %>% filter(length > 29)
-
-acf0 <- AC_stof %>% filter(length < 18)
-ghf0 <- GH_stof %>% filter(length < 20)
-apf0 <- AP_stof %>% filter(length < 30)
-
-table(acf0$pa, acf0$year)
-table(acf1$pa, acf1$year)
-table(acf2$pa, acf2$year)
-table(apf0$pa, apf0$year)
-table(apf1$pa, apf1$year)
-table(ghf0$pa, ghf0$year)
-table(ghf1$pa, ghf1$year)
-table(ghf2$pa, ghf2$year)
-
+# For supplemental
 Cacf1 <- AC_stof %>% filter(length > 17 & length <= 45)
-Cacf2 <- AC_stof %>% filter(length > 45) %>% filter(year != 1995)
+Cacf2 <- AC_stof %>% filter(length > 45)
 Cghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
 Cghf2 <- GH_stof %>% filter(length > 40)
-Capf1 <- AP_stof %>% filter(length > 29) %>% filter(year != 2014)
+Capf1 <- AP_stof %>% filter(length > 29)
 
-Cacf0 <- AC_stof %>% filter(length < 18) %>% filter(year != 2011 & year != 2020)
+Cacf0 <- AC_stof %>% filter(length < 18)
 Cghf0 <- GH_stof %>% filter(length < 20)
-Capf0 <- AP_stof %>% filter(length < 30) %>% filter(year != 2014)
+Capf0 <- AP_stof %>% filter(length < 30)
+
+# table(Cacf0$pa, Cacf0$year)
+# table(Cacf1$pa, Cacf1$year)
+# table(Cacf2$pa, Cacf2$year)
+# table(Capf0$pa, Capf0$year)
+# table(Capf1$pa, Capf1$year)
+# table(Cghf0$pa, Cghf0$year)
+# table(Cghf1$pa, Cghf1$year)
+# table(Cghf2$pa, Cghf2$year)
 
 ```
 
@@ -434,13 +393,13 @@ dfap1 <- reshape(data.frame(table(Tap1$year, Tap1$season)), idvar = "Var1", time
 
 
 ac <- data.frame(year = seq(1984,2020,1), 
-                 ac0_spring = c(rep(0,11), dfac0$ac0_spring[1:16], 0, dfac0$ac0_spring[17:24], rep(0,1)),
+                 ac0_spring = c(dfac0$ac0_spring[1:9], 0, 0, dfac0$ac0_spring[10:35]), # missing 1993, 1994
                  ac1_spring = c(dfac1$ac1_spring),
-                 ac2_spring = c(dfac2$ac2_spring[1:11], 0, dfac2$ac2_spring[12:36]),
+                 ac2_spring = c(dfac2$ac2_spring),
                  
-                 ac0_fall = c(rep(0,4), dfac0$ac0_fall[1], rep(0,6), dfac0$ac0_fall[1:16], 0, dfac0$ac0_fall[17:24], rep(0,1)),
+                 ac0_fall = c(dfac0$ac0_fall[1:9], 0, 0, dfac0$ac0_fall[10:35]), # missing 1993, 1994
                  ac1_fall = c(dfac1$ac1_fall),
-                 ac2_fall = c(dfac2$ac2_fall[1:11], 0, dfac2$ac2_fall[12:36]))
+                 ac2_fall = c(dfac2$ac2_fall))
 write.csv(ac, file = "./Extra/acseason.csv")
 
 
@@ -462,117 +421,6 @@ ap <- data.frame(year = seq(1984,2020,1),
                  ap0_fall = c(dfap0$ap0_fall),
                  ap1_fall = c(dfap1$ap1_fall))
 write.csv(ap, file = "./Extra/apseason.csv")
-
-```
-
-## - Table 1
-```{r}
-
-sample_size <- data.frame(
-  E.C.Spr = c(nrow(filter(Tac0, geartype == "engel" & season == "spring" & content == "called")),
-              nrow(filter(Tac1, geartype == "engel" & season == "spring" & content == "called")),
-              nrow(filter(Tac2, geartype == "engel" & season == "spring" & content == "called")),
-              nrow(filter(Tgh0, geartype == "engel" & season == "spring" & content == "called")),
-              nrow(filter(Tgh1, geartype == "engel" & season == "spring" & content == "called")),
-              nrow(filter(Tgh2, geartype == "engel" & season == "spring" & content == "called")),
-              nrow(filter(Tap0, geartype == "engel" & season == "spring" & content == "called")),
-              nrow(filter(Tap1, geartype == "engel" & season == "spring" & content == "called"))),
-  E.C.Fall = c(nrow(filter(Tac0, geartype == "engel" & season == "fall" & content == "called")),
-               nrow(filter(Tac1, geartype == "engel" & season == "fall" & content == "called")),
-               nrow(filter(Tac2, geartype == "engel" & season == "fall" & content == "called")),
-               nrow(filter(Tgh0, geartype == "engel" & season == "fall" & content == "called")),
-               nrow(filter(Tgh1, geartype == "engel" & season == "fall" & content == "called")),
-               nrow(filter(Tgh2, geartype == "engel" & season == "fall" & content == "called")),
-               nrow(filter(Tap0, geartype == "engel" & season == "fall" & content == "called")),
-               nrow(filter(Tap1, geartype == "engel" & season == "fall" & content == "called"))),
-  E.F.Spr = c(nrow(filter(Tac0, geartype == "engel" & season == "spring" & content == "full")),
-              nrow(filter(Tac1, geartype == "engel" & season == "spring" & content == "full")),
-              nrow(filter(Tac2, geartype == "engel" & season == "spring" & content == "full")),
-              nrow(filter(Tgh0, geartype == "engel" & season == "spring" & content == "full")),
-              nrow(filter(Tgh1, geartype == "engel" & season == "spring" & content == "full")),
-              nrow(filter(Tgh2, geartype == "engel" & season == "spring" & content == "full")),
-              nrow(filter(Tap0, geartype == "engel" & season == "spring" & content == "full")),
-              nrow(filter(Tap1, geartype == "engel" & season == "spring" & content == "full"))),
-  E.F.Fall = c(nrow(filter(Tac0, geartype == "engel" & season == "fall" & content == "full")),
-               nrow(filter(Tac1, geartype == "engel" & season == "fall" & content == "full")),
-               nrow(filter(Tac2, geartype == "engel" & season == "fall" & content == "full")),
-               nrow(filter(Tgh0, geartype == "engel" & season == "fall" & content == "full")),
-               nrow(filter(Tgh1, geartype == "engel" & season == "fall" & content == "full")),
-               nrow(filter(Tgh2, geartype == "engel" & season == "fall" & content == "full")),
-               nrow(filter(Tap0, geartype == "engel" & season == "fall" & content == "full")),
-               nrow(filter(Tap1, geartype == "engel" & season == "fall" & content == "full"))),
-  E.pcapelin =  c(nrow(filter(Tac0, geartype == "engel" & pa == "0"))/nrow(filter(Tac0, geartype == "engel"))*100,
-                  nrow(filter(Tac1, geartype == "engel" & pa == "0"))/nrow(filter(Tac1, geartype == "engel"))*100,
-                  nrow(filter(Tac2, geartype == "engel" & pa == "0"))/nrow(filter(Tac2, geartype == "engel"))*100,
-                  nrow(filter(Tgh0, geartype == "engel" & pa == "0"))/nrow(filter(Tgh0, geartype == "engel"))*100,
-                  nrow(filter(Tgh1, geartype == "engel" & pa == "0"))/nrow(filter(Tgh1, geartype == "engel"))*100,
-                  nrow(filter(Tgh2, geartype == "engel" & pa == "0"))/nrow(filter(Tgh2, geartype == "engel"))*100,
-                  nrow(filter(Tap0, geartype == "engel" & pa == "0"))/nrow(filter(Tap0, geartype == "engel"))*100,
-                  nrow(filter(Tap1, geartype == "engel" & pa == "0"))/nrow(filter(Tap1, geartype == "engel"))*100),
-  E.pempty =  c(nrow(filter(Tac0, geartype == "engel" & empty == TRUE))/nrow(filter(Tac0, geartype == "engel"))*100,
-                nrow(filter(Tac1, geartype == "engel" & empty == TRUE))/nrow(filter(Tac1, geartype == "engel"))*100,
-                nrow(filter(Tac2, geartype == "engel" & empty == TRUE))/nrow(filter(Tac2, geartype == "engel"))*100,
-                nrow(filter(Tgh0, geartype == "engel" & empty == TRUE))/nrow(filter(Tgh0, geartype == "engel"))*100,
-                nrow(filter(Tgh1, geartype == "engel" & empty == TRUE))/nrow(filter(Tgh1, geartype == "engel"))*100,
-                nrow(filter(Tgh2, geartype == "engel" & empty == TRUE))/nrow(filter(Tgh2, geartype == "engel"))*100,
-                nrow(filter(Tap0, geartype == "engel" & empty == TRUE))/nrow(filter(Tap0, geartype == "engel"))*100,
-                nrow(filter(Tap1, geartype == "engel" & empty == TRUE))/nrow(filter(Tap1, geartype == "engel"))*100),
-  
-  C.C.Spr = c(nrow(filter(Tac0, geartype == "campelen" & season == "spring" & content == "called")),
-              nrow(filter(Tac1, geartype == "campelen" & season == "spring" & content == "called")),
-              nrow(filter(Tac2, geartype == "campelen" & season == "spring" & content == "called")),
-              nrow(filter(Tgh0, geartype == "campelen" & season == "spring" & content == "called")),
-              nrow(filter(Tgh1, geartype == "campelen" & season == "spring" & content == "called")),
-              nrow(filter(Tgh2, geartype == "campelen" & season == "spring" & content == "called")),
-              nrow(filter(Tap0, geartype == "campelen" & season == "spring" & content == "called")),
-              nrow(filter(Tap1, geartype == "campelen" & season == "spring" & content == "called"))),
-  C.C.Fall = c(nrow(filter(Tac0, geartype == "campelen" & season == "fall" & content == "called")),
-               nrow(filter(Tac1, geartype == "campelen" & season == "fall" & content == "called")),
-               nrow(filter(Tac2, geartype == "campelen" & season == "fall" & content == "called")),
-               nrow(filter(Tgh0, geartype == "campelen" & season == "fall" & content == "called")),
-               nrow(filter(Tgh1, geartype == "campelen" & season == "fall" & content == "called")),
-               nrow(filter(Tgh2, geartype == "campelen" & season == "fall" & content == "called")),
-               nrow(filter(Tap0, geartype == "campelen" & season == "fall" & content == "called")),
-               nrow(filter(Tap1, geartype == "campelen" & season == "fall" & content == "called"))),
-  C.F.Spr = c(nrow(filter(Tac0, geartype == "campelen" & season == "spring" & content == "full")),
-              nrow(filter(Tac1, geartype == "campelen" & season == "spring" & content == "full")),
-              nrow(filter(Tac2, geartype == "campelen" & season == "spring" & content == "full")),
-              nrow(filter(Tgh0, geartype == "campelen" & season == "spring" & content == "full")),
-              nrow(filter(Tgh1, geartype == "campelen" & season == "spring" & content == "full")),
-              nrow(filter(Tgh2, geartype == "campelen" & season == "spring" & content == "full")),
-              nrow(filter(Tap0, geartype == "campelen" & season == "spring" & content == "full")),
-              nrow(filter(Tap1, geartype == "campelen" & season == "spring" & content == "full"))),
-  C.F.Fall = c(nrow(filter(Tac0, geartype == "campelen" & season == "fall" & content == "full")),
-               nrow(filter(Tac1, geartype == "campelen" & season == "fall" & content == "full")),
-               nrow(filter(Tac2, geartype == "campelen" & season == "fall" & content == "full")),
-               nrow(filter(Tgh0, geartype == "campelen" & season == "fall" & content == "full")),
-               nrow(filter(Tgh1, geartype == "campelen" & season == "fall" & content == "full")),
-               nrow(filter(Tgh2, geartype == "campelen" & season == "fall" & content == "full")),
-               nrow(filter(Tap0, geartype == "campelen" & season == "fall" & content == "full")),
-               nrow(filter(Tap1, geartype == "campelen" & season == "fall" & content == "full"))),
-  C.pcapelin =  c(nrow(filter(Tac0, geartype == "campelen" & pa == "0"))/nrow(filter(Tac0, geartype == "campelen"))*100,
-                  nrow(filter(Tac1, geartype == "campelen" & pa == "0"))/nrow(filter(Tac1, geartype == "campelen"))*100,
-                  nrow(filter(Tac2, geartype == "campelen" & pa == "0"))/nrow(filter(Tac2, geartype == "campelen"))*100,
-                  nrow(filter(Tgh0, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh0, geartype == "campelen"))*100,
-                  nrow(filter(Tgh1, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh1, geartype == "campelen"))*100,
-                  nrow(filter(Tgh2, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh2, geartype == "campelen"))*100,
-                  nrow(filter(Tap0, geartype == "campelen" & pa == "0"))/nrow(filter(Tap0, geartype == "campelen"))*100,
-                  nrow(filter(Tap1, geartype == "campelen" & pa == "0"))/nrow(filter(Tap1, geartype == "campelen"))*100),
-  C.pempty = c(nrow(filter(Tac0, geartype == "campelen" & empty == TRUE))/nrow(filter(Tac0, geartype == "campelen"))*100,
-                nrow(filter(Tac1, geartype == "campelen" & empty == TRUE))/nrow(filter(Tac1, geartype == "campelen"))*100,
-                nrow(filter(Tac2, geartype == "campelen" & empty == TRUE))/nrow(filter(Tac2, geartype == "campelen"))*100,
-                nrow(filter(Tgh0, geartype == "campelen" & empty == TRUE))/nrow(filter(Tgh0, geartype == "campelen"))*100,
-                nrow(filter(Tgh1, geartype == "campelen" & empty == TRUE))/nrow(filter(Tgh1, geartype == "campelen"))*100,
-                nrow(filter(Tgh2, geartype == "campelen" & empty == TRUE))/nrow(filter(Tgh2, geartype == "campelen"))*100,
-                nrow(filter(Tap0, geartype == "campelen" & empty == TRUE))/nrow(filter(Tap0, geartype == "campelen"))*100,
-                nrow(filter(Tap1, geartype == "campelen" & empty == TRUE))/nrow(filter(Tap1, geartype == "campelen"))*100)
-
-)
-
-sample_size <- sample_size %>% mutate(E.pcapelin = format(E.pcapelin, digits = 4), C.pcapelin = format(C.pcapelin, digits = 4),
-                                      E.pempty = format(E.pempty, digits = 4), C.pempty = format(C.pempty, digits = 4))
-
-write.csv(x = sample_size, file = "./Extra/samplesize_16.05.25.csv")
 
 ```
 
@@ -630,15 +478,15 @@ plotdf <- data.frame(time = multi_inner[,1],
 se <- ggplot(data = plotdf) +  
   geom_line(aes(x = time, y = ts, colour = "trawl"), size = 1.4, linetype = "dashed") +
   
-  geom_line( aes(x = time, y = ac1, colour = "ac", linetype = "medium"), size = 1.4) +
-  geom_line(aes(x = time, y = ac2, colour = "ac", linetype = "large"), size = 1.4) +
+  geom_line( aes(x = time, y = ac1, colour = "ac", linetype = "medium"), linewidth = 1.4) +
+  geom_line(aes(x = time, y = ac2, colour = "ac", linetype = "large"), linewidth = 1.4) +
   
-  geom_line(aes(x = time, y = gh1, colour = "gh", linetype = "medium"), size = 1.4) +
-  geom_line(aes(x = time, y = gh2, colour = "gh", linetype = "large"), size = 1.4) +
+  geom_line(aes(x = time, y = gh1, colour = "gh", linetype = "medium"), linewidth = 1.4) +
+  geom_line(aes(x = time, y = gh2, colour = "gh", linetype = "large"), linewidth = 1.4) +
   
-  geom_line(aes(x = time, y = ap1, colour = "ap", linetype = "medium"), size = 1.4) +
+  geom_line(aes(x = time, y = ap1, colour = "ap", linetype = "medium"), linewidth = 1.4) +
   
-  scale_x_continuous(name = "Year", expand = c(0.009,0), limits = c(1983.9,1995.2), breaks = c(seq(1983,1995, 2))) + 
+  scale_x_continuous(name = "Year", expand = c(0.009,0), limits = c(1983.9,1995.4), breaks = c(seq(1983,1995, 2))) + 
   scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.0,1.7)) +
   scale_color_manual(name = "", values = c(trawl = "brown", ac = "#BC8DA0", gh = "#048BA8", ap = "#AFD5AA"),
                      labels = c(trawl = "Trawl", ac = "Atlantic cod", gh = "Greenland halibut", ap = "American plaice")) +
@@ -735,15 +583,15 @@ plotdf <- data.frame(time = gh_multi_inner[,1],
 fe <- ggplot(data = plotdf) +  
   geom_line(aes(x = time, y = ts, colour = "trawl"), size = 1.4, linetype = "dashed") +
   
-  geom_line( aes(x = time, y = ac1, colour = "ac", linetype = "medium"), size = 1.4) +
-  geom_line(aes(x = time, y = ac2, colour = "ac", linetype = "large"), size = 1.4) +
+  geom_line( aes(x = time, y = ac1, colour = "ac", linetype = "medium"), linewidth = 1.4) +
+  geom_line(aes(x = time, y = ac2, colour = "ac", linetype = "large"), linewidth = 1.4) +
   
-  geom_line(aes(x = time, y = gh1, colour = "gh", linetype = "medium"), size = 1.4) +
-  geom_line(aes(x = time, y = gh2, colour = "gh", linetype = "large"), size = 1.4) +
+  geom_line(aes(x = time, y = gh1, colour = "gh", linetype = "medium"), linewidth = 1.4) +
+  geom_line(aes(x = time, y = gh2, colour = "gh", linetype = "large"), linewidth = 1.4) +
   
-  geom_line(aes(x = time, y = ap1, colour = "ap", linetype = "medium"), size = 1.4) +
+  geom_line(aes(x = time, y = ap1, colour = "ap", linetype = "medium"), linewidth = 1.4) +
   
-  scale_x_continuous(name = "Year", expand = c(0.009,0), limits = c(1983.9,1995.2), breaks = c(seq(1983,1995, 2))) + 
+  scale_x_continuous(name = "Year", expand = c(0.009,0), limits = c(1983.9,1995.4), breaks = c(seq(1983,1995, 2))) + 
   scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0)) +
   scale_color_manual(name = "", values = c(trawl = "brown", ac = "#BC8DA0", gh = "#048BA8", ap = "#AFD5AA"),
                      labels = c(trawl = "Trawl", ac = "Atlantic cod", gh = "Greenland halibut", ap = "American plaice")) +
@@ -839,13 +687,13 @@ plotdf <- data.frame(time = gh_multi_inner[,1],
 
 # plot
 sc <- ggplot(data = plotdf) +  
-  geom_line(aes(x = time, y = ts, colour = "trawl"), size = 1.4, linetype = "dashed") +
+  geom_line(aes(x = time, y = ts, colour = "trawl"), linetype = "dashed", linewidth = 1.4) +
   
-  geom_line( aes(x = time, y = ac1, colour = "ac"), size = 1.4, linetype = "solid") +
+  geom_line(aes(x = time, y = ac1, colour = "ac"), linetype = "solid", linewidth = 1.4) +
   
-  geom_line(aes(x = time, y = gh1, colour = "gh"), size = 1.4, linetype = "solid") +
+  geom_line(aes(x = time, y = gh1, colour = "gh"), linetype = "solid", linewidth = 1.4) +
   
-  geom_line(aes(x = time, y = ap1, colour = "ap"), size = 1.4, linetype = "solid") +
+  geom_line(aes(x = time, y = ap1, colour = "ap"), linetype = "solid", linewidth = 1.4) +
   
   scale_x_continuous(name = "Year", expand = c(0,0.1), limits = c(1994.9,2022), breaks = c(seq(1995, 2022, 5))) + 
   scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.95, 2.2)) +
@@ -911,13 +759,13 @@ plotdf <- data.frame(time = multi_inner[,1],
 fc <- ggplot(data = plotdf) +  
   geom_line(aes(x = time, y = ts, colour = "trawl"), size = 1.4, linetype = "dashed") +
   
-  geom_line( aes(x = time, y = ac1, colour = "ac", linetype = "medium"), size = 1.4) +
-  geom_line(aes(x = time, y = ac2, colour = "ac", linetype = "large"), size = 1.4) +
+  geom_line( aes(x = time, y = ac1, colour = "ac", linetype = "medium"), linewidth = 1.4) +
+  geom_line(aes(x = time, y = ac2, colour = "ac", linetype = "large"), linewidth = 1.4) +
   
-  geom_line(aes(x = time, y = gh1, colour = "gh", linetype = "medium"), size = 1.4) +
-  geom_line(aes(x = time, y = gh2, colour = "gh", linetype = "large"), size = 1.4) +
+  geom_line(aes(x = time, y = gh1, colour = "gh", linetype = "medium"), linewidth = 1.4) +
+  geom_line(aes(x = time, y = gh2, colour = "gh", linetype = "large"), linewidth = 1.4) +
   
-  geom_line(aes(x = time, y = ap1, colour = "ap", linetype = "medium"), size = 1.4) +
+  geom_line(aes(x = time, y = ap1, colour = "ap", linetype = "medium"), linewidth = 1.4) +
   
   scale_x_continuous(name = "Year", expand = c(0,0.1), limits = c(1994.9,2022), breaks = c(seq(1995, 2022, 5))) + 
   scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.32, 1.6)) +
@@ -927,25 +775,24 @@ fc <- ggplot(data = plotdf) +
                         labels = c(medium = "Medium", large = "Large")) +
   ggtitle("d) 2J3KL Fall") + 
   theme_classic() + 
-  theme(legend.position = "none", 
-        axis.title.y = element_blank(),
+  theme(axis.title.y = element_blank(), legend.text = element_text(size = 16), 
         axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
         plot.title = element_text(size = 16, face = "bold"))
 
 
 ```
 ## - Figure 2
-```{r, fig.height=10, fig.width=12}
+```{r, fig.height=10, fig.width=14}
 
-p1 <- ggarrange(se,
+p2 <- ggarrange(se,
           sc,
           fe,
           fc,
           nrow = 2, ncol = 2,
           align = "v", common.legend = TRUE,
-          legend = "right", legend.grob = ggpubr::get_legend(fc+theme(legend.position = "right", lengend.text = element_text(size = 15))))
+          legend = "right", legend.grob = ggpubr::get_legend(fc))
 
-ggsave(filename = "inputdata1.tiff", device = "tiff", plot = p1, path = "./Figures",
+ggsave(filename = "inputdata2.tiff", device = "tiff", plot = p2, path = "./Figures",
        dpi = 300, width = 14, height = 10, units = "in")
 
 
