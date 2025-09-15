@@ -11,7 +11,7 @@ Author - [Kerri E. Lynch](Kerri.Lynch@mi.mun.ca), Marine Institute of Memorial U
 
 This code accompanies Lynch et al. (Submitted), where we estimated an abundance index for capelin in the Northwest Atlantic between 1984 - 2020.
 
-<img src="./Figures/Methods.png"/>
+<img src="./Figures/methods.png"/>
 
 # Code purpose and order
 
@@ -28,13 +28,15 @@ This code is intended to allow readers/reviewers the ability to repeat analyses 
 
 `Analysis/` - Folder housing Rscripts used to set up and run models for different geartypes (Campelen, Engel) and seasons (fall, spring)
 
+* `FullStomach_process.R` - R script for converting 'full' stomach content data into 'called' stomach data format (i.e., determine two top prey species by weight) that is used in all analyses
+
 * `Campelen/`
     + `Fall/`
       - `FallCamp-SetUp.R` - R script for loading fall Campelen data for modelling
       - `FallCamp-Base.R` - R script for running fall Campelen data with the Base NLFPM
       - `FallCamp-Length.R` - R script for running fall Campelen data with the Length NLFPM (ontogentic effect)
-      - `FallCamp-monoTemp.R` - R script for running fall Campelen data with the monoTemp NLFPM (temperature effect)
-      - `FallCamp-monoTempLength.R` - R script for running fall Campelen data with the monoTempLength NLFPM (temperature and ontogentic effect)
+      - `FallCamp-monoTemp.R` - R script for running fall Campelen data with the monoTemp NLFPM (monotonic temperature effect)
+      - `FallCamp-monoTempLength.R` - R script for running fall Campelen data with the monoTempLength NLFPM (monotonic temperature and ontogentic effect)
       - `FallCamp-Temp.R` - R script for running fall Campelen data with the Temp NLFPM (temperature effect)
       - `FallCamp-TempLength.R` - R script for running fall Campelen data with the TempLength NLFPM (temperature and ontogentic effect)
     + `Spring/`

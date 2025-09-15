@@ -36,7 +36,7 @@ fishy_dat <- make_data(n = c(length(trawlf$year),
                        temp = c(trawlf$bot.temp, 
                                 c(ac1$bot.temp, ac2$bot.temp),
                                 c(gh1$bot.temp, gh2$bot.temp),
-                                ap1$bot.temp)
+                                c(ap1$bot.temp))
 )
 
 
