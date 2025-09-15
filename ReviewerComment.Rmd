@@ -1,0 +1,299 @@
+---
+title: "ReviewerComment"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(rnaturalearthhires)
+library(sf)
+library(ggspatial)
+```
+
+```{r}
+notenclosed <- read_sf("./Data/NAFO_Divisions_SHP/NAFO_Divisions_2021_line_not_enclosed.shp")
+JKsubocean <- notenclosed %>% filter(Division == "2J"|Division == "3K") 
+Lsubocean <- notenclosed %>% filter(Division == "3L")
+
+poly <- read_sf("./Data/NAFO_Divisions_SHP/NAFO_Divisions_2021_poly_clipped.shp")
+JKsubpoly <- poly %>% filter(Division == "2J"|Division == "3K")
+Lsubpoly <- poly %>% filter(Division == "3L")
+
+acsurv <- read_sf("./Data/Survey_Area/general_survey_area.shp")
+```
+
+# Engel
+## Spring
+```{r}
+source("./Analysis/Engel/Spring/SprEng-SetUp.R")
+x <- raster::raster(xmn = -61, xmx = -42.5, ymn = 46, ymx = 56)
+terra::res(x) = c(0.5,0.5)
+
+## Trawl data removal
+trawl_cords <- data.frame(long = -eng_spr$long_dd, 
+                    lat = eng_spr$lat_dd) 
+trawl_anomaly_spdf <- sp::SpatialPointsDataFrame(trawl_cords, data.frame(pa = eng_spr$trawl_pa))
+
+# Mean catch for the trawl
+trawl_mean_catch <- raster::dropLayer(raster::rasterize(trawl_anomaly_spdf, x, fun = mean, na.rm = TRUE), 1) 
+trawl_mean_catch <- terra::rast(trawl_mean_catch)
+trawl_catch_raster <- terra::as.data.frame(trawl_mean_catch, xy = TRUE) %>% 
+  mutate(colour_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+## Trawl and stomach data removal
+all_cords <- data.frame(long = c(-eng_spr$long_dd, -stom_spr$long_dd), 
+                    lat = c(eng_spr$lat_dd, stom_spr$lat_dd)) 
+all_anomaly_spdf <- sp::SpatialPointsDataFrame(all_cords, data.frame(pa = c(eng_spr$trawl_pa, stom_spr$pa)))
+
+# Mean catch for the trawl
+all_mean_catch <- raster::dropLayer(raster::rasterize(all_anomaly_spdf, x, fun = mean, na.rm = TRUE), 1) 
+all_mean_catch <- terra::rast(all_mean_catch)
+all_catch_raster <- terra::as.data.frame(all_mean_catch, xy = TRUE) %>% mutate(colour_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+# combine mean_catch data frames together 
+trawltoall <- full_join(trawl_catch_raster, all_catch_raster, by = c("x", "y")) %>% 
+  rename(trawl_pa = pa.x, trawl_colour_category = colour_category.x,
+         all_pa = pa.y, all_colour_category = colour_category.y) 
+
+# find cells where trawl data is removed & find what all data mean_catch is
+trawltoall <- trawltoall %>% mutate(both_colour_category = NA, 
+                                    both_colour_category = ifelse(trawl_colour_category == "Zero" & 
+                                                                    all_colour_category == "Non-Zero", "Trawl_Zero", both_colour_category)) %>% 
+  mutate(pa = ifelse(both_colour_category == "Trawl_Zero", all_pa, NA))
+
+# plot
+remSE <- ggplot() +
+  geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
+
+  geom_raster(data = trawltoall, aes(x = x, y = y, fill = pa)) +
+
+  geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")), fontface = 2, size = 6) +
+  geom_sf(data = JKsubocean,  color = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = Lsubocean, colour = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = acsurv, colour = "blue", linewidth = 0.5, fill = NA) +
+  ggtitle("Engel\na) 3L Spring") + 
+
+  scale_x_continuous(name = "Longitude", limits = c(-59, -42), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
+  scale_y_continuous(name = "Latitude", limits = c(45, 56), breaks = c(seq(46, 56, 4)), expand = c(0,0)) +
+  scale_fill_viridis_c(name = "Proportion of \ncapelin catches") +
+  theme_minimal() +
+  theme(title = element_text(size = 15, face = "bold"),
+        axis.title.y = element_blank(), axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"))
+
+
+
+#
+trawl_zero <- trawltoall %>% filter(both_colour_category == "Trawl_Zero")
+raster::rasterFromXYZ(x = trawl_zero$x, y = trawl_zero$y, z = trawl_zero$trawl_pa)
+
+
+# Get raster values for areas added by all data and not by trawl data
+trawl_rasValue <- raster::extract(all_mean_catch, trawl_zero[,c('x','y')])
+
+# Join lat & long values 
+trawl_combinePointValue <- cbind(trawl_cords, trawl_rasValue)
+
+
+trawl_good_coords <- data.frame("lat_dd" = trawl_zero$y, "long_dd" = trawl_zero$x)
+# Remove coords in original df with bad pa levels
+trawl_eng_good <- eng_spr %>% filter(lat_dd %in% trawl_good_coords$lat_dd & long_dd %in% -trawl_good_coords$long_dd) %>% rename(pa = trawl_pa)
+trawl_stom_good <- stom_spr %>% filter(lat_dd %in% trawl_good_coords$lat_dd & long_dd %in% -trawl_good_coords$long_dd)
+trawl_good <- rbind(trawl_eng_good[c('year','pa')], trawl_stom_good[c('year', 'pa')])
+
+
+
+
+
+
+
+```
+
+## Fall
+```{r}
+source("./Analysis/Engel/Fall/FallEng-SetUp.R")
+x <- raster::raster(xmn = -61, xmx = -42.5, ymn = 46, ymx = 56)
+terra::res(x) = c(0.5,0.5)
+
+## Trawl data removal
+trawl_cords <- data.frame(long = -eng_fall$long_dd, 
+                    lat = eng_fall$lat_dd) 
+trawl_anomaly_spdf <- sp::SpatialPointsDataFrame(trawl_cords, data.frame(pa = eng_fall$trawl_pa))
+
+# Mean catch for the trawl
+trawl_mean_catch <- raster::dropLayer(raster::rasterize(trawl_anomaly_spdf, x, fun = mean, na.rm = TRUE), 1) 
+trawl_mean_catch <- terra::rast(trawl_mean_catch)
+trawl_catch_raster <- terra::as.data.frame(trawl_mean_catch, xy = TRUE) %>% 
+  mutate(colour_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+## Trawl and stomach data removal
+all_cords <- data.frame(long = c(-eng_fall$long_dd, -stom_fall$long_dd), 
+                    lat = c(eng_fall$lat_dd, stom_fall$lat_dd)) 
+all_anomaly_spdf <- sp::SpatialPointsDataFrame(all_cords, data.frame(pa = c(eng_fall$trawl_pa, stom_fall$pa)))
+
+# Mean catch for the trawl
+all_mean_catch <- raster::dropLayer(raster::rasterize(all_anomaly_spdf, x, fun = mean, na.rm = TRUE), 1) 
+all_mean_catch <- terra::rast(all_mean_catch)
+all_catch_raster <- terra::as.data.frame(all_mean_catch, xy = TRUE) %>% mutate(colour_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+# combine mean_catch data frames together 
+trawltoall <- full_join(trawl_catch_raster, all_catch_raster, by = c("x", "y")) %>% 
+  rename(trawl_pa = pa.x, trawl_colour_category = colour_category.x,
+         all_pa = pa.y, all_colour_category = colour_category.y) 
+
+# find cells where trawl data is removed & find what all data mean_catch is
+trawltoall <- trawltoall %>% mutate(both_colour_category = NA, 
+                                    both_colour_category = ifelse(trawl_colour_category == "Zero" & all_colour_category == "Non-Zero", "Trawl_Zero", both_colour_category)) %>% 
+  mutate(pa = ifelse(both_colour_category == "Trawl_Zero", all_pa, NA))
+
+# plot
+remFE <- ggplot() +
+  geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
+
+  geom_raster(data = trawltoall, aes(x = x, y = y, fill = pa)) +
+
+  geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")), fontface = 2, size = 6) +
+  geom_sf(data = JKsubocean,  color = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = Lsubocean, colour = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = acsurv, colour = "blue", linewidth = 0.5, fill = NA) +
+  ggtitle("c) 2J3KL Fall") + 
+  
+  scale_x_continuous(name = "Longitude", limits = c(-59, -42), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
+  scale_y_continuous(name = "Latitude", limits = c(45, 56), breaks = c(seq(46, 56, 4)), expand = c(0,0)) +
+  scale_fill_viridis_c(name = "Proportion of \ncapelin catches", limits = c(0,0.1)) +
+  theme_minimal() +
+  theme(title = element_text(size = 15, face = "bold"),
+        axis.title.y = element_blank(), axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"))
+```
+
+# Campelen
+## Spring
+```{r}
+source("./Analysis/Campelen/Spring/SprCamp-SetUp.R")
+x <- raster::raster(xmn = -61, xmx = -42.5, ymn = 46, ymx = 56)
+terra::res(x) = c(0.5,0.5)
+
+## Trawl data removal
+trawl_cords <- data.frame(long = -camp_spr$long_dd, 
+                    lat = camp_spr$lat_dd) 
+trawl_anomaly_spdf <- sp::SpatialPointsDataFrame(trawl_cords, data.frame(pa = camp_spr$trawl_pa))
+
+# Mean catch for the trawl
+trawl_mean_catch <- raster::dropLayer(raster::rasterize(trawl_anomaly_spdf, x, fun = mean, na.rm = TRUE), 1) 
+trawl_mean_catch <- terra::rast(trawl_mean_catch)
+trawl_catch_raster <- terra::as.data.frame(trawl_mean_catch, xy = TRUE) %>% 
+  mutate(colour_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+## Trawl and stomach data removal
+all_cords <- data.frame(long = c(-camp_spr$long_dd, -stom_spr$long_dd), 
+                    lat = c(camp_spr$lat_dd, stom_spr$lat_dd)) 
+all_anomaly_spdf <- sp::SpatialPointsDataFrame(all_cords, data.frame(pa = c(camp_spr$trawl_pa, stom_spr$pa)))
+
+# Mean catch for the trawl
+all_mean_catch <- raster::dropLayer(raster::rasterize(all_anomaly_spdf, x, fun = mean, na.rm = TRUE), 1) 
+all_mean_catch <- terra::rast(all_mean_catch)
+all_catch_raster <- terra::as.data.frame(all_mean_catch, xy = TRUE) %>% mutate(colour_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+# combine mean_catch data frames together 
+trawltoall <- full_join(trawl_catch_raster, all_catch_raster, by = c("x", "y")) %>% 
+  rename(trawl_pa = pa.x, trawl_colour_category = colour_category.x,
+         all_pa = pa.y, all_colour_category = colour_category.y) 
+
+# find cells where trawl data is removed & find what all data mean_catch is
+trawltoall <- trawltoall %>% mutate(both_colour_category = NA, 
+                                    both_colour_category = ifelse(trawl_colour_category == "Zero" & all_colour_category == "Non-Zero", "Trawl_Zero", both_colour_category)) %>% 
+  mutate(pa = ifelse(both_colour_category == "Trawl_Zero", all_pa, NA))
+
+# plot
+remSC <- ggplot() +
+  geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
+
+  geom_raster(data = trawltoall, aes(x = x, y = y, fill = pa)) +
+
+  geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")), fontface = 2, size = 6) +
+  geom_sf(data = JKsubocean,  color = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = Lsubocean, colour = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = acsurv, colour = "blue", linewidth = 0.5, fill = NA) +
+  ggtitle("Campelen\nb) 3L Spring") + 
+  
+  scale_x_continuous(name = "Longitude", limits = c(-59, -42), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
+  scale_y_continuous(name = "Latitude", limits = c(45, 56), breaks = c(seq(46, 56, 4)), expand = c(0,0)) +
+  scale_fill_viridis_c(name = "Proportion of \ncapelin catches") +
+  theme_minimal() +
+  theme(title = element_text(size = 15, face = "bold"),
+        axis.title.y = element_blank(), axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"))
+```
+
+## Fall
+```{r}
+source("./Analysis/Campelen/Fall/FallCamp-SetUp.R")
+x <- raster::raster(xmn = -61, xmx = -42.5, ymn = 46, ymx = 56)
+terra::res(x) = c(0.5,0.5)
+
+## Trawl data removal
+trawl_cords <- data.frame(long = -camp_fall$long_dd, 
+                    lat = camp_fall$lat_dd) 
+trawl_anomaly_spdf <- sp::SpatialPointsDataFrame(trawl_cords, data.frame(pa = camp_fall$trawl_pa))
+
+# Mean catch for the trawl
+trawl_mean_catch <- raster::dropLayer(raster::rasterize(trawl_anomaly_spdf, x, fun = mean, na.rm = TRUE), 1) 
+trawl_mean_catch <- terra::rast(trawl_mean_catch)
+trawl_catch_raster <- terra::as.data.frame(trawl_mean_catch, xy = TRUE) %>% 
+  mutate(colour_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+## Trawl and stomach data removal
+all_cords <- data.frame(long = c(-camp_fall$long_dd, -stom_fall$long_dd), 
+                    lat = c(camp_fall$lat_dd, stom_fall$lat_dd)) 
+all_anomaly_spdf <- sp::SpatialPointsDataFrame(all_cords, data.frame(pa = c(camp_fall$trawl_pa, stom_fall$pa)))
+
+# Mean catch for the trawl
+all_mean_catch <- raster::dropLayer(raster::rasterize(all_anomaly_spdf, x, fun = mean, na.rm = TRUE), 1) 
+all_mean_catch <- terra::rast(all_mean_catch)
+all_catch_raster <- terra::as.data.frame(all_mean_catch, xy = TRUE) %>% mutate(colour_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+# combine mean_catch data frames together 
+trawltoall <- full_join(trawl_catch_raster, all_catch_raster, by = c("x", "y")) %>% 
+  rename(trawl_pa = pa.x, trawl_colour_category = colour_category.x,
+         all_pa = pa.y, all_colour_category = colour_category.y) 
+
+# find cells where trawl data is removed & find what all data mean_catch is
+trawltoall <- trawltoall %>% mutate(both_colour_category = NA, 
+                                    both_colour_category = ifelse(trawl_colour_category == "Zero" & all_colour_category == "Non-Zero", "Trawl_Zero", both_colour_category)) %>% 
+  mutate(pa = ifelse(both_colour_category == "Trawl_Zero", all_pa, NA))
+
+# plot
+remFC <- ggplot() +
+  geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
+
+  geom_raster(data = trawltoall, aes(x = x, y = y, fill = pa)) +
+
+  geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")), fontface = 2, size = 6) +
+  geom_sf(data = JKsubocean,  color = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = Lsubocean, colour = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = acsurv, colour = "blue", linewidth = 0.5, fill = NA) +
+  ggtitle("d) 2J3KL Fall") + 
+  
+  scale_x_continuous(name = "Longitude", limits = c(-59, -42), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
+  scale_y_continuous(name = "Latitude", limits = c(45, 56), breaks = c(seq(46, 56, 4)), expand = c(0,0)) +
+  scale_fill_viridis_c(name = "Proportion of \ncapelin catches") +
+  theme_minimal() +
+  theme(title = element_text(size = 15, face = "bold"),
+        axis.title.y = element_blank(), axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"))
+```
+# Figure
+```{r, fig.width=12, fig.height=10}
+
+pmaps <- ggpubr::ggarrange(remSE,
+                           remSC,
+                           remFE,
+                           remFC,
+                           nrow = 2, ncol = 2,
+                           align = "v")
+
+
+ggsave(filename = "trawltoall_maps.tiff", device = "tiff", plot = pmaps, path = "./Figures",
+       dpi = 300, width = 12, height = 10, units = "in")
+
+```

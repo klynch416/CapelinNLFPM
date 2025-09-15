@@ -4,105 +4,230 @@
 library(tidyverse)
 library(cowplot)
 library(ggpubr)
-```
 
-# Map
-
-```{r}
-library(ggOceanMaps)
-library(grid)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(rnaturalearthhires)
 library(sf)
 library(ggspatial)
+```
 
-# .ggOceanMapsenv <- new.env() ## set new environment to save shape file
-# .ggOceanMapsenv$datapath <- "./Data/dd_rbathy_cont.rda"
+# Data removed maps
 
-notenclosed <- read_sf("C:/Users/klynch/OneDrive - Marine Institute of Memorial University (1)/Thesis/Manu_1/Code/Chap1/Data/NAFO_Divisions_SHP/NAFO_Divisions_2021_line_not_enclosed.shp")
+```{r}
+notenclosed <- read_sf("./Data/NAFO_Divisions_SHP/NAFO_Divisions_2021_line_not_enclosed.shp")
 JKsubocean <- notenclosed %>% filter(Division == "2J"|Division == "3K") 
 Lsubocean <- notenclosed %>% filter(Division == "3L")
 
-poly <- read_sf("C:/Users/klynch/OneDrive - Marine Institute of Memorial University (1)/Thesis/Manu_1/Code/Chap1/Data/NAFO_Divisions_SHP/NAFO_Divisions_2021_poly_clipped.shp")
+poly <- read_sf("./Data/NAFO_Divisions_SHP/NAFO_Divisions_2021_poly_clipped.shp")
 JKsubpoly <- poly %>% filter(Division == "2J"|Division == "3K")
 Lsubpoly <- poly %>% filter(Division == "3L")
 
-acsurv <- read_sf("C:/Users/klynch/OneDrive - Marine Institute of Memorial University (1)/Thesis/Manu_1/Code/Chap1/Data/Survey_Area/general_survey_area.shp")
+acsurv <- read_sf("./Data/Survey_Area/general_survey_area.shp")
 
 ```
-## - Figure 1
-```{r, fig.width=5, fig.height=5}
-load("./Data/nlbasemap.RData")
 
-map <-  nlmap +
-  geom_spatial_text(aes(x = -50, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")))+
+## Engel
 
+### Spring
+
+```{r}
+source("./Analysis/Engel/Spring/SprEng-SetUp.R")
+
+capelin_catch_raster <- terra::as.data.frame(mean_catch, xy = TRUE)
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+capelin_catch_raster <- capelin_catch_raster %>% mutate(colour_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+pMSE <- ggplot() +
+  geom_tile(data = filter(capelin_catch_raster, colour_category == "Zero"), aes(x = x, y = y), fill = "grey80") +
+  geom_tile(data = filter(capelin_catch_raster, colour_category == "Non-Zero"), aes(x = x, y = y, fill = pa)) +
+
+  geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
+
+  geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")), fontface = 2, size = 6) +
   geom_sf(data = JKsubocean,  color = "red", linewidth = 0.5, fill = NA) +
   geom_sf(data = Lsubocean, colour = "red", linewidth = 0.5, fill = NA) +
   geom_sf(data = acsurv, colour = "blue", linewidth = 0.5, fill = NA) +
 
-  scale_x_continuous(name = "Longitude", breaks = seq(-59, -42, 4), expand = c(0,0)) +
-  scale_y_continuous(name = "Latitude", breaks = seq(46, 56, 4), expand = c(0,0)) +
+  scale_x_continuous(name = "Longitude", limits = c(-59, -42), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
+  scale_y_continuous(name = "Latitude", limits = c(45, 56), breaks = c(seq(46, 56, 4)), expand = c(0,0)) +
+  scale_fill_viridis_c(name = "Proportion of \ncapelin catches", limits = c(0,1)) +
+  ggtitle("Engel\na) 3L Spring ") +
   
   annotation_scale(location = "br") +
   annotation_north_arrow(location = "tr", which_north = "true", height = unit(0.7, "cm"), width = unit(0.7, "cm")) +
-  theme(legend.position = "none")
 
-
-ggsave(filename = "map.tiff", device = "tiff", plot = map, path = "./Figures",
-       dpi = 300, width = 5, height = 5, units = "in")
+  theme_minimal() +
+  theme(legend.position = "none", title = element_text(size = 15, face = "bold"),
+        axis.title.x = element_blank(), axis.text = element_text(size = 15), axis.title = element_text(size = 16, face = "bold"))
 
 ```
 
-
-# Abundance Section
-
-## Acoustic
-
-### Engel
+### Fall
 
 ```{r}
-eng_ac_surv <- read.csv("./Data/Capelin_AccSurv_85-2024.csv") %>% 
-  filter(year > 1980 & year < 1996)
 
-## Survey year proper
-p1 <- ggplot(data = eng_ac_surv) +
-  geom_line(aes(x = year, y = biomass_med), colour = "#BB2D05", linewidth = 1) +
-  geom_point(aes(x = year, y = biomass_med), size = 1.5, shape = 22, colour = "#BB2D05", fill = "#BB2D05") +
+source("./Analysis/Engel/Fall/FallEng-SetUp.R")
+
+capelin_catch_raster <- terra::as.data.frame(mean_catch, xy = TRUE)
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+capelin_catch_raster <- capelin_catch_raster %>%  mutate(color_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+pMFE <- ggplot() +
+  geom_tile(data = filter(capelin_catch_raster, color_category == "Zero"), aes(x = x, y = y), fill = "grey80") +
+  geom_tile(data = filter(capelin_catch_raster, color_category == "Non-Zero"), aes(x = x, y = y, fill = pa)) +
   
-  geom_errorbar(aes(x = year, y = biomass_med, ymin = bm_lci, ymax = bm_uci), colour = "#BB2D05", width = 0.2) +
+  geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
+  
+  geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")), fontface = 2, size = 6) +
+  geom_sf(data = JKsubocean,  color = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = Lsubocean, colour = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = acsurv, colour = "blue", linewidth = 0.5, fill = NA) +
 
-  scale_x_continuous(name = "Year", expand = c(0.009,0), limits = c(1983.9,1995.2), breaks = c(seq(1983,1995, 2))) + 
-  scale_y_continuous(name = "3L Spring  Acoustic Capelin Biomass (kt)", expand = c(0.02,0), limits = c(0,9000)) +
-  ggtitle("Engel Timeseries\na) 3L Spring") +
-  theme_classic() +
-  theme(legend.position = "none",
-        axis.line.x = element_line(size = 0.5), 
-        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
-        plot.title = element_text(size = 16, face = "bold"))
+  scale_x_continuous(name = "Longitude", limits = c(-59, -42), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
+  scale_y_continuous(name = "Latitude", limits = c(45, 56), breaks = c(seq(46, 56, 4)), expand = c(0,0)) +
+  scale_fill_viridis_c(name = "Proportion of \ncapelin catches", limits = c(0,1)) +
+  ggtitle("c) 2J3KL Fall") +
+
+  annotation_scale(location = "br") +
+  annotation_north_arrow(location = "tr", which_north = "true", height = unit(0.7, "cm"), width = unit(0.7, "cm")) +
+
+  theme_minimal() +
+  theme(legend.position = "none", title = element_text(size = 15, face = "bold"),
+        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"))
 
 ```
 
-### Campelen
+## Campelen
+
+### Spring
 
 ```{r}
-camp_ac_surv <- read.csv("./Data/Capelin_AccSurv_85-2024.csv") %>% 
-  filter(year > 1994)
+source("./Analysis/Campelen/Spring/SprCamp-SetUp.R")
 
-## Survey year proper
-p2 <- ggplot(data = camp_ac_surv) +
-  geom_line(aes(x = year, y = biomass_med), colour = "#BB2D05", linewidth = 1) +
-  geom_point(aes(x = year, y = biomass_med), size = 1.5, shape = 22, colour = "#BB2D05", fill = "#BB2D05") +
+capelin_catch_raster <- terra::as.data.frame(mean_catch, xy = TRUE)
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+capelin_catch_raster <- capelin_catch_raster %>%  mutate(color_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+pMSC <- ggplot() +
+  geom_tile(data = filter(capelin_catch_raster, color_category == "Zero"), aes(x = x, y = y), fill = "grey80") +
+  geom_tile(data = filter(capelin_catch_raster, color_category == "Non-Zero"), aes(x = x, y = y, fill = pa)) +
   
-  geom_errorbar(aes(x = year, y = biomass_med, ymin = bm_lci, ymax = bm_uci), colour = "#BB2D05", width = 0.2) +
+  geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
 
-  scale_x_continuous(name = "Year", expand = c(0,0.1), limits = c(1994.9,2022.1), breaks = c(seq(1995, 2022, 5))) +
-  scale_y_continuous(name = "3L Spring  Acoustic Capelin Biomass (kt)", expand = c(0.02,0), limits = c(0, 1100)) +
-  ggtitle("Campelen Timeseries\nb) 3L Spring") +
-  theme_classic() +
-  theme(legend.position = "none",
-        axis.line.x = element_line(size = 0.5), 
-        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
-        plot.title = element_text(size = 16, face = "bold"))
+  geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")), fontface = 2, size = 6) +
+  geom_sf(data = JKsubocean,  color = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = Lsubocean, colour = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = acsurv, colour = "blue", linewidth = 0.5, fill = NA) +
+
+  scale_x_continuous(name = "Longitude", limits = c(-59, -42), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
+  scale_y_continuous(name = "Latitude", limits = c(45, 56), breaks = c(seq(46, 56, 4)), expand = c(0,0)) +
+  scale_fill_viridis_c(name = "Proportion of \ncapelin catches", limits = c(0,1)) +
+  ggtitle("Campelen\nb) 3L Spring") + 
+
+  annotation_scale(location = "br") +
+  annotation_north_arrow(location = "tr", which_north = "true", height = unit(0.7, "cm"), width = unit(0.7, "cm")) +
+
+  theme_minimal() +
+  theme(title = element_text(size = 15, face = "bold"), legend.text = element_text(size = 12),
+        axis.title.x = element_blank(), axis.title.y = element_blank(),
+        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"))
+
 ```
+
+### Fall
+
+```{r, fig.width=5, fig.height=6}
+
+source("./Analysis/Campelen/Fall/FallCamp-SetUp.R")
+
+capelin_catch_raster <- terra::as.data.frame(mean_catch, xy = TRUE)
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+capelin_catch_raster <- capelin_catch_raster %>%  mutate(color_category = ifelse(pa == 0, "Zero", "Non-Zero"))
+
+# ggplot(capelin_catch_raster, aes(x = x, y = y, fill = pa))+
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   labs(title = "Proportion of Capelin catches")
+
+pMFC <- ggplot() +
+  geom_tile(data = filter(capelin_catch_raster, color_category == "Zero"), aes(x = x, y = y), fill = "grey80") +
+  geom_tile(data = filter(capelin_catch_raster, color_category == "Non-Zero"), aes(x = x, y = y, fill = pa)) +
+
+  geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
+  
+  geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J", "3K", "3L")), fontface = 2, size = 6) +
+  geom_sf(data = JKsubocean,  color = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = Lsubocean, colour = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = acsurv, colour = "blue", linewidth = 0.5, fill = NA) +
+
+  scale_x_continuous(name = "Longitude", limits = c(-59, -42), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
+  scale_y_continuous(name = "Latitude", limits = c(45, 56), breaks = c(seq(46, 56, 4)), expand = c(0,0)) +
+  scale_fill_viridis_c(name = "Proportion of \ncapelin catches", limits = c(0,1)) +
+  ggtitle("d) 2J3KL Fall") + 
+
+  annotation_scale(location = "br") +
+  annotation_north_arrow(location = "tr", which_north = "true", height = unit(0.7, "cm"), width = unit(0.7, "cm")) +
+
+  theme_minimal() +
+  theme(legend.position = "none", title = element_text(size = 15, face = "bold"),
+        axis.title.y = element_blank(), axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"))
+
+
+```
+
+## - Figure 1
+```{r, fig.width=12, fig.height=10}
+
+pmaps <- ggpubr::ggarrange(pMSE,
+                           pMSC,
+                           pMFE,
+                           pMFC,
+                           nrow = 2, ncol = 2,
+                           align = "v", common.legend = TRUE,
+                           legend = "right", legend.grob = ggpubr::get_legend(pMSC+theme(legend.position = "right"))
+)
+
+ggsave(filename = "datamaps.tiff", device = "tiff", plot = pmaps, path = "./Figures",
+       dpi = 300, width = 12, height = 10, units = "in")
+
+```
+
 
 # Sample size
 
@@ -114,13 +239,13 @@ load(file = "./ModelSaves/Set_Up/SE-1995.RData")
 
 Eacs1 <- AC_stos %>% filter(length > 17 & length <= 45) %>% filter(year != 1995)
 Eacs2 <- AC_stos %>% filter(length > 45) %>% filter(year != 1995)
+Eaps1 <- AP_stos %>% filter(length > 29)
 Eghs1 <- GH_stos %>% filter(length > 19 & length <= 40)
 Eghs2 <- GH_stos %>% filter(length > 40)
-Eaps1 <- AP_stos %>% filter(length > 29)
 
-Eacs0 <- AC_stos %>% filter(length < 18) %>% filter(year == 1982)
-Eghs0 <- GH_stos %>% filter(length < 20) %>% filter(year != 1984)
+Eacs0 <- AC_stos %>% filter(length < 18) %>% filter(year == 1987) # no observations for this year but don't want any year that is present
 Eaps0 <- AP_stos %>% filter(length < 30) %>% filter(year != 1984)
+Eghs0 <- GH_stos %>% filter(length < 20) %>% filter(year != 1984)
 
 ```
 
@@ -130,29 +255,15 @@ load(file = "./ModelSaves/Set_Up/FE-1994.RData")
 
 Eacf1 <- AC_stof %>% filter(length > 17 & length <= 45)
 Eacf2 <- AC_stof %>% filter(length > 45) %>% filter(year != 1994)
+Eapf1 <- AP_stof %>% filter(length > 29)
 Eghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
 Eghf2 <- GH_stof %>% filter(length > 40)
-Eapf1 <- AP_stof %>% filter(length > 29)
 
 Eacf0 <- AC_stof %>% filter(length < 18) %>% filter(year == 1988)
-Eghf0 <- GH_stof %>% filter(length < 20)
 Eapf0 <- AP_stof %>% filter(length < 30)
+Eghf0 <- GH_stof %>% filter(length < 20)
 
 ```
-
-### Total
-```{r}
-Eac0 <- rbind(Eacs0, Eacf0) %>% mutate(alt.name = "Atlantic cod")
-Eac1 <- rbind(Eacs1, Eacf1) %>% mutate(alt.name = "Atlantic cod")
-Eac2 <- rbind(Eacs2, Eacf2) %>% mutate(alt.name = "Atlantic cod")
-Eap0 <- rbind(Eaps0, Eapf0) %>% mutate(alt.name = "American plaice")
-Eap1 <- rbind(Eaps1, Eapf1) %>% mutate(alt.name = "American plaice")
-Egh0 <- rbind(Eghs0, Eghf0) %>% mutate(alt.name = "Greenland halibut")
-Egh1 <- rbind(Eghs1, Eghf1) %>% mutate(alt.name = "Greenland halibut")
-Egh2 <- rbind(Eghs2, Eghf2) %>% mutate(alt.name = "Greenland halibut")
-
-```
-
 
 ## Campelen
 
@@ -162,13 +273,13 @@ load(file = "./ModelSaves/Set_Up/SC-2019.RData")
 
 Cacs1 <- AC_stos %>% filter(length > 17 & length <= 45) %>% filter(year != 1998 & year != 2017)
 Cacs2 <- AC_stos %>% filter(length > 45) %>% filter(year != 2015)
+Caps1 <- AP_stos %>% filter(length > 29)%>% filter(year != 2017)
 Cghs1 <- GH_stos %>% filter(length > 19 & length <= 40) %>% filter(year != 2017)
-Cghs2 <- GH_stos %>% filter(length > 40)
-Caps1 <- AP_stos %>% filter(length > 29) %>% filter(year != 2017)
+Cghs2 <- GH_stos %>% filter(length > 40) %>% filter(year != 2017)
 
 Cacs0 <- AC_stos %>% filter(length < 18) %>% filter(year != 1996 & year != 1998 & year != 1999 & year != 2006 & year != 2011 & year != 2017)
-Cghs0 <- GH_stos %>% filter(length < 20) %>% filter(year != 2015 & year != 2017)
 Caps0 <- AP_stos %>% filter(length < 30) %>% filter(year != 2017)
+Cghs0 <- GH_stos %>% filter(length < 20) %>% filter(year != 2017)
 
 ```
 
@@ -179,32 +290,17 @@ load(file = "./ModelSaves/Set_Up/FC-2020.RData")
 
 Cacf1 <- AC_stof %>% filter(length > 17 & length <= 45)
 Cacf2 <- AC_stof %>% filter(length > 45) %>% filter(year != 1995)
+Capf1 <- AP_stof %>% filter(length > 29) %>% filter(year != 2014)
 Cghf1 <- GH_stof %>% filter(length > 19 & length <= 40)
 Cghf2 <- GH_stof %>% filter(length > 40)
-Capf1 <- AP_stof %>% filter(length > 29) %>% filter(year != 2014)
 
 Cacf0 <- AC_stof %>% filter(length < 18) %>% filter(year != 2011 & year != 2020)
-Cghf0 <- GH_stof %>% filter(length < 20)
 Capf0 <- AP_stof %>% filter(length < 30) %>% filter(year != 2014)
+Cghf0 <- GH_stof %>% filter(length < 20)
 
 ```
 
-### Total
-```{r}
-
-Cac0 <- rbind(Cacs0, Cacf0) %>% mutate(alt.name = "Atlantic cod")
-Cac1 <- rbind(Cacs1, Cacf1) %>% mutate(alt.name = "Atlantic cod")
-Cac2 <- rbind(Cacs2, Cacf2) %>% mutate(alt.name = "Atlantic cod")
-Cap0 <- rbind(Caps0, Capf0) %>% mutate(alt.name = "American plaice")
-Cap1 <- rbind(Caps1, Capf1) %>% mutate(alt.name = "American plaice")
-Cgh0 <- rbind(Cghs0, Cghf0) %>% mutate(alt.name = "Greenland halibut")
-Cgh1 <- rbind(Cghs1, Cghf1) %>% mutate(alt.name = "Greenland halibut")
-Cgh2 <- rbind(Cghs2, Cghf2) %>% mutate(alt.name = "Greenland halibut")
-
-```
-
-
-## All data
+## - Table 1
 ```{r}
 # Combine seasonal data for
 ## Engel
@@ -245,10 +341,6 @@ Tgh0 <- rbind(Egh0, Cgh0)
 Tgh1 <- rbind(Egh1, Cgh1)
 Tgh2 <- rbind(Egh2, Cgh2)
 
-```
-
-## - Table 1
-```{r}
 
 sample_size <- data.frame(
   E.C.Spr = c(nrow(filter(Tac0, geartype == "engel" & season == "spring" & content == "called")),
@@ -283,22 +375,21 @@ sample_size <- data.frame(
                nrow(filter(Tgh2, geartype == "engel" & season == "fall" & content == "full")),
                nrow(filter(Tap0, geartype == "engel" & season == "fall" & content == "full")),
                nrow(filter(Tap1, geartype == "engel" & season == "fall" & content == "full"))),
-  E.pcapelin =  c(nrow(filter(Tac0, geartype == "engel" & pa == "0"))/nrow(filter(Tac0, geartype == "engel"))*100,
-                  nrow(filter(Tac1, geartype == "engel" & pa == "0"))/nrow(filter(Tac1, geartype == "engel"))*100,
-                  nrow(filter(Tac2, geartype == "engel" & pa == "0"))/nrow(filter(Tac2, geartype == "engel"))*100,
-                  nrow(filter(Tgh0, geartype == "engel" & pa == "0"))/nrow(filter(Tgh0, geartype == "engel"))*100,
-                  nrow(filter(Tgh1, geartype == "engel" & pa == "0"))/nrow(filter(Tgh1, geartype == "engel"))*100,
-                  nrow(filter(Tgh2, geartype == "engel" & pa == "0"))/nrow(filter(Tgh2, geartype == "engel"))*100,
-                  nrow(filter(Tap0, geartype == "engel" & pa == "0"))/nrow(filter(Tap0, geartype == "engel"))*100,
-                  nrow(filter(Tap1, geartype == "engel" & pa == "0"))/nrow(filter(Tap1, geartype == "engel"))*100),
-  E.pempty =  c(nrow(filter(Tac0, geartype == "engel" & empty == TRUE))/nrow(filter(Tac0, geartype == "engel"))*100,
-                nrow(filter(Tac1, geartype == "engel" & empty == TRUE))/nrow(filter(Tac1, geartype == "engel"))*100,
-                nrow(filter(Tac2, geartype == "engel" & empty == TRUE))/nrow(filter(Tac2, geartype == "engel"))*100,
-                nrow(filter(Tgh0, geartype == "engel" & empty == TRUE))/nrow(filter(Tgh0, geartype == "engel"))*100,
-                nrow(filter(Tgh1, geartype == "engel" & empty == TRUE))/nrow(filter(Tgh1, geartype == "engel"))*100,
-                nrow(filter(Tgh2, geartype == "engel" & empty == TRUE))/nrow(filter(Tgh2, geartype == "engel"))*100,
-                nrow(filter(Tap0, geartype == "engel" & empty == TRUE))/nrow(filter(Tap0, geartype == "engel"))*100,
-                nrow(filter(Tap1, geartype == "engel" & empty == TRUE))/nrow(filter(Tap1, geartype == "engel"))*100),
+  E.pempty =  c(nrow(filter(Tac0, geartype == "engel" & pa == "0"))/nrow(filter(Tac0, geartype == "engel"))*100,
+                nrow(filter(Tac1, geartype == "engel" & pa == "0"))/nrow(filter(Tac1, geartype == "engel"))*100,
+                nrow(filter(Tac2, geartype == "engel" & pa == "0"))/nrow(filter(Tac2, geartype == "engel"))*100,
+                nrow(filter(Tgh0, geartype == "engel" & pa == "0"))/nrow(filter(Tgh0, geartype == "engel"))*100,
+                nrow(filter(Tgh1, geartype == "engel" & pa == "0"))/nrow(filter(Tgh1, geartype == "engel"))*100,
+                nrow(filter(Tgh2, geartype == "engel" & pa == "0"))/nrow(filter(Tgh2, geartype == "engel"))*100,
+                nrow(filter(Tap0, geartype == "engel" & pa == "0"))/nrow(filter(Tap0, geartype == "engel"))*100,
+                nrow(filter(Tap1, geartype == "engel" & pa == "0"))/nrow(filter(Tap1, geartype == "engel"))*100),  E.pemptycapelin =  c(nrow(filter(Tac0, geartype == "engel" & empty == "1"))/nrow(filter(Tac0, geartype == "engel"))*100,
+                nrow(filter(Tac1, geartype == "engel" & empty == "1"))/nrow(filter(Tac1, geartype == "engel"))*100,
+                nrow(filter(Tac2, geartype == "engel" & empty == "1"))/nrow(filter(Tac2, geartype == "engel"))*100,
+                nrow(filter(Tgh0, geartype == "engel" & empty == "1"))/nrow(filter(Tgh0, geartype == "engel"))*100,
+                nrow(filter(Tgh1, geartype == "engel" & empty == "1"))/nrow(filter(Tgh1, geartype == "engel"))*100,
+                nrow(filter(Tgh2, geartype == "engel" & empty == "1"))/nrow(filter(Tgh2, geartype == "engel"))*100,
+                nrow(filter(Tap0, geartype == "engel" & empty == "1"))/nrow(filter(Tap0, geartype == "engel"))*100,
+                nrow(filter(Tap1, geartype == "engel" & empty == "1"))/nrow(filter(Tap1, geartype == "engel"))*100),
   
   C.C.Spr = c(nrow(filter(Tac0, geartype == "campelen" & season == "spring" & content == "called")),
               nrow(filter(Tac1, geartype == "campelen" & season == "spring" & content == "called")),
@@ -332,29 +423,81 @@ sample_size <- data.frame(
                nrow(filter(Tgh2, geartype == "campelen" & season == "fall" & content == "full")),
                nrow(filter(Tap0, geartype == "campelen" & season == "fall" & content == "full")),
                nrow(filter(Tap1, geartype == "campelen" & season == "fall" & content == "full"))),
-  C.pcapelin =  c(nrow(filter(Tac0, geartype == "campelen" & pa == "0"))/nrow(filter(Tac0, geartype == "campelen"))*100,
-                  nrow(filter(Tac1, geartype == "campelen" & pa == "0"))/nrow(filter(Tac1, geartype == "campelen"))*100,
-                  nrow(filter(Tac2, geartype == "campelen" & pa == "0"))/nrow(filter(Tac2, geartype == "campelen"))*100,
-                  nrow(filter(Tgh0, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh0, geartype == "campelen"))*100,
-                  nrow(filter(Tgh1, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh1, geartype == "campelen"))*100,
-                  nrow(filter(Tgh2, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh2, geartype == "campelen"))*100,
-                  nrow(filter(Tap0, geartype == "campelen" & pa == "0"))/nrow(filter(Tap0, geartype == "campelen"))*100,
-                  nrow(filter(Tap1, geartype == "campelen" & pa == "0"))/nrow(filter(Tap1, geartype == "campelen"))*100),
-  C.pempty = c(nrow(filter(Tac0, geartype == "campelen" & empty == TRUE))/nrow(filter(Tac0, geartype == "campelen"))*100,
-                nrow(filter(Tac1, geartype == "campelen" & empty == TRUE))/nrow(filter(Tac1, geartype == "campelen"))*100,
-                nrow(filter(Tac2, geartype == "campelen" & empty == TRUE))/nrow(filter(Tac2, geartype == "campelen"))*100,
-                nrow(filter(Tgh0, geartype == "campelen" & empty == TRUE))/nrow(filter(Tgh0, geartype == "campelen"))*100,
-                nrow(filter(Tgh1, geartype == "campelen" & empty == TRUE))/nrow(filter(Tgh1, geartype == "campelen"))*100,
-                nrow(filter(Tgh2, geartype == "campelen" & empty == TRUE))/nrow(filter(Tgh2, geartype == "campelen"))*100,
-                nrow(filter(Tap0, geartype == "campelen" & empty == TRUE))/nrow(filter(Tap0, geartype == "campelen"))*100,
-                nrow(filter(Tap1, geartype == "campelen" & empty == TRUE))/nrow(filter(Tap1, geartype == "campelen"))*100)
+  C.pemptycapelin =  c(nrow(filter(Tac0, geartype == "campelen" & pa == "0"))/nrow(filter(Tac0, geartype == "campelen"))*100,
+                nrow(filter(Tac1, geartype == "campelen" & pa == "0"))/nrow(filter(Tac1, geartype == "campelen"))*100,
+                nrow(filter(Tac2, geartype == "campelen" & pa == "0"))/nrow(filter(Tac2, geartype == "campelen"))*100,
+                nrow(filter(Tgh0, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh0, geartype == "campelen"))*100,
+                nrow(filter(Tgh1, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh1, geartype == "campelen"))*100,
+                nrow(filter(Tgh2, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh2, geartype == "campelen"))*100,
+                nrow(filter(Tap0, geartype == "campelen" & pa == "0"))/nrow(filter(Tap0, geartype == "campelen"))*100,
+                nrow(filter(Tap1, geartype == "campelen" & pa == "0"))/nrow(filter(Tap1, geartype == "campelen"))*100),
+  C.pempty =  c(nrow(filter(Tac0, geartype == "campelen" & empty == "0"))/nrow(filter(Tac0, geartype == "campelen"))*100,
+                nrow(filter(Tac1, geartype == "campelen" & empty == "1"))/nrow(filter(Tac1, geartype == "campelen"))*100,
+                nrow(filter(Tac2, geartype == "campelen" & empty == "1"))/nrow(filter(Tac2, geartype == "campelen"))*100,
+                nrow(filter(Tgh0, geartype == "campelen" & empty == "1"))/nrow(filter(Tgh0, geartype == "campelen"))*100,
+                nrow(filter(Tgh1, geartype == "campelen" & empty == "1"))/nrow(filter(Tgh1, geartype == "campelen"))*100,
+                nrow(filter(Tgh2, geartype == "campelen" & empty == "1"))/nrow(filter(Tgh2, geartype == "campelen"))*100,
+                nrow(filter(Tap0, geartype == "campelen" & empty == "1"))/nrow(filter(Tap0, geartype == "campelen"))*100,
+                nrow(filter(Tap1, geartype == "campelen" & empty == "1"))/nrow(filter(Tap1, geartype == "campelen"))*100)
 
 )
 
-sample_size <- sample_size %>% mutate(E.pcapelin = format(E.pcapelin, digits = 4), C.pcapelin = format(C.pcapelin, digits = 4),
-                                      E.pempty = format(E.pempty, digits = 4), C.pempty = format(C.pempty, digits = 4))
+sample_size <- sample_size %>% mutate(E.pemptycapelin = format(E.pemptycapelin, digits = 4), C.pemptycapelin = format(C.pemptycapelin, digits = 4), E.pempty = format(E.pempty, digits = 4), C.pempty = format(C.pempty, digits = 4))
 
-write.csv(x = sample_size, file = "./Figures/samplesize.csv")
+write.csv(x = sample_size, file = "./Extra/samplesize.csv")
+
+```
+
+
+# Abundance Section
+
+## Acoustic
+
+### Engel
+
+```{r}
+eng_ac_surv <- read.csv("./Data/Capelin_AccSurv_85-2024.csv") %>% 
+  filter(year >= 1984 & year < 1996)
+
+## Survey year proper
+p1 <- ggplot(data = eng_ac_surv) +
+  geom_line(aes(x = year, y = biomass_med), colour = "#BB2D05", linewidth = 1) +
+  geom_point(aes(x = year, y = biomass_med), size = 1.5, shape = 22, colour = "#BB2D05", fill = "#BB2D05") +
+  
+  geom_errorbar(aes(x = year, y = biomass_med, ymin = bm_lci, ymax = bm_uci), colour = "#BB2D05", width = 0.2) +
+
+  scale_x_continuous(name = "Year", expand = c(0.009,0), limits = c(1983.9,1995.2), breaks = c(seq(1983,1995, 2))) +
+  scale_y_continuous(name = "3L Spring  Acoustic Capelin Biomass (kt)", expand = c(0.02,0), limits = c(0,9000)) +
+  ggtitle("Engel Timeseries\na) 3L Spring") +
+  theme_classic() +
+  theme(legend.position = "none",
+        axis.line.x = element_line(size = 0.5), 
+        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
+        plot.title = element_text(size = 16, face = "bold"))
+
+```
+
+### Campelen
+
+```{r}
+camp_ac_surv <- read.csv("./Data/Capelin_AccSurv_85-2024.csv") %>% 
+  filter(year > 1994)
+
+## Survey year proper
+p2 <- ggplot(data = camp_ac_surv) +
+  geom_line(aes(x = year, y = biomass_med), colour = "#BB2D05", linewidth = 1) +
+  geom_point(aes(x = year, y = biomass_med), size = 1.5, shape = 22, colour = "#BB2D05", fill = "#BB2D05") +
+  
+  geom_errorbar(aes(x = year, y = biomass_med, ymin = bm_lci, ymax = bm_uci), colour = "#BB2D05", width = 0.2) +
+
+  scale_x_continuous(name = "Year", expand = c(0,0.1), limits = c(1994.9,2022.1), breaks = c(seq(1995, 2022, 5))) +
+  scale_y_continuous(name = "3L Spring  Acoustic Capelin Biomass (kt)", expand = c(0.02,0), limits = c(0, 1100)) +
+  ggtitle("Campelen Timeseries\nb) 3L Spring") +
+  theme_classic() +
+  theme(legend.position = "none",
+        axis.line.x = element_line(size = 0.5), 
+        axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
+        plot.title = element_text(size = 16, face = "bold"))
 
 ```
 
@@ -363,22 +506,35 @@ write.csv(x = sample_size, file = "./Figures/samplesize.csv")
 ### Spring
 
 ```{r}
-load(file = "./ModelSaves/SprEng_Length.RData")
+load(file = "./ModelSaves/ACAP-SprEng_Length.RData")
+load(file = "./ModelSaves/GH-SprEng_Length.RData")
 
-# Confidence intervals
-low_rho = sdrep$value[names(sdrep$value) == "iye"] - qnorm(0.975)*sdrep$sd[names(sdrep$value) == "iye"]
-high_rho = sdrep$value[names(sdrep$value) == "iye"] + qnorm(0.975)*sdrep$sd[names(sdrep$value) == "iye"]
-ts_df <- data.frame(ts = rep$iye, year = sort(unique(fishy_dat$year)), low_sd = low_rho, high_sd = high_rho)
+# Confidence intervals for Greenland halibut model
+gh_low_rho = gh_sdrep$value[names(gh_sdrep$value) == "iye"] - qnorm(0.975)*gh_sdrep$sd[names(gh_sdrep$value) == "iye"]
+gh_high_rho = gh_sdrep$value[names(gh_sdrep$value) == "iye"] + qnorm(0.975)*gh_sdrep$sd[names(gh_sdrep$value) == "iye"]
+gh_ts_df <- data.frame(ts = gh_rep$iye, time = sort(unique(gh_fishy_dat$year)), low_sd = gh_low_rho, high_sd = gh_high_rho)
+
+# Confidence intervals for Atlantic cod/American plaice model
+ac_low_rho = ac_sdrep$value[names(ac_sdrep$value) == "iye"] - qnorm(0.975)*ac_sdrep$sd[names(ac_sdrep$value) == "iye"]
+ac_high_rho = ac_sdrep$value[names(ac_sdrep$value) == "iye"] + qnorm(0.975)*ac_sdrep$sd[names(ac_sdrep$value) == "iye"]
+ac_ts_df <- data.frame(ts = ac_rep$iye, time = sort(unique(ac_fishy_dat$year)), low_sd = ac_low_rho, high_sd = ac_high_rho)
 
 p3 <- ggplot() +
-    
-  geom_ribbon(data = ts_df, aes(x = year, y = ts, ymin = low_sd, ymax = high_sd), alpha = 0.2) +
-  geom_line(data = ts_df, aes(x = year, y = ts, colour = "all" ), linewidth = 1.5) +
-  geom_point(data = ts_df, aes(x = year, y = ts, colour = "all"), size = 1.5) +
   
-  scale_x_continuous(name = "Year", expand = c(0.009,0), limits = c(1983.9,1995.2), breaks = c(seq(1983,1995, 2))) + 
-  scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.3,2.0)) +
-  scale_color_manual(name = "Species Model", values = c(all = "black"), labels = c(all = "All species")) +
+  geom_ribbon(data = gh_ts_df, aes(x = time, y = ts, ymin = low_sd, ymax = high_sd), alpha = 0.2) +
+  geom_line(data = gh_ts_df, aes(x = time, y = ts, colour = "gh"), linewidth = 1.5) +
+  geom_point(data = gh_ts_df, aes(x = time, y = ts, colour = "gh"), size = 1.5) +
+  
+  geom_ribbon(data = ac_ts_df, aes(x = time, y = ts, ymin = low_sd, ymax = high_sd), alpha = 0.2) +
+  geom_line(data = ac_ts_df, aes(x = time, y = ts, colour = "ac"), linewidth = 1.5) +
+  geom_point(data = ac_ts_df, aes(x = time, y = ts, colour = "ac"), size = 1.5) +
+  
+  scale_x_continuous(name = "Year", expand = c(0.009,0), limits = c(1983.9,1995.2), breaks = c(seq(1983,1995, 2))) +
+  scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.0, 2.0)) +
+  scale_color_manual(name = "Species Model",
+                     breaks = c("all", "surv", "ac", "gh", "ap"), 
+                     values = c(all = "black", surv = "#BB2D05", ac = "#BC8DA0", gh = "#048BA8", ap = "#FF7733"),
+                     labels = c(all = "All species", surv = "Acoustic survey", ac = "Cod/ Plaice", gh = "Greenland halibut", ap = "American plaice")) +
   guides(colour = guide_legend(keyheight = 0.4, default.unit = "cm")) +
   
   ggtitle("c) 3L Spring") +
@@ -433,6 +589,7 @@ p4 <- ggplot() +
         axis.line.x = element_line(size = 0.5), 
         axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
         plot.title = element_text(size = 16, face = "bold"))
+
 ```
 
 ## Campelen
@@ -440,18 +597,18 @@ p4 <- ggplot() +
 ### Spring
 
 ```{r}
-load(file = "./ModelSaves/ACAP-SprCamp_Base.RData")
-load(file = "./ModelSaves/GH-SprCamp_Base.RData")
+load(file = "./ModelSaves/ACAP-SprCamp_Length.RData")
+load(file = "./ModelSaves/GH-SprCamp_Length.RData")
 
 # Confidence intervals for Greenland halibut model
 gh_low_rho = gh_sdrep$value[names(gh_sdrep$value) == "iye"] - qnorm(0.975)*gh_sdrep$sd[names(gh_sdrep$value) == "iye"]
 gh_high_rho = gh_sdrep$value[names(gh_sdrep$value) == "iye"] + qnorm(0.975)*gh_sdrep$sd[names(gh_sdrep$value) == "iye"]
-gh_ts_df <- data.frame(ts = gh_rep$iye, time = gh_multi_inner[,1], low_sd = gh_low_rho, high_sd = gh_high_rho)
+gh_ts_df <- data.frame(ts = gh_rep$iye, time = sort(unique(gh_fishy_dat$year)), low_sd = gh_low_rho, high_sd = gh_high_rho)
 
 # Confidence intervals for Atlantic cod/American plaice model
 ac_low_rho = ac_sdrep$value[names(ac_sdrep$value) == "iye"] - qnorm(0.975)*ac_sdrep$sd[names(ac_sdrep$value) == "iye"]
 ac_high_rho = ac_sdrep$value[names(ac_sdrep$value) == "iye"] + qnorm(0.975)*ac_sdrep$sd[names(ac_sdrep$value) == "iye"]
-ac_ts_df <- data.frame(ts = ac_rep$iye, time = ac_multi_inner[,1], low_sd = ac_low_rho, high_sd = ac_high_rho)
+ac_ts_df <- data.frame(ts = ac_rep$iye, time = sort(unique(ac_fishy_dat$year)), low_sd = ac_low_rho, high_sd = ac_high_rho)
 
 p5 <- ggplot() +
   # Taking common legend from this plot, have to make stand-in lines
@@ -486,6 +643,7 @@ p5 <- ggplot() +
         axis.line.x = element_line(size = 0.5), 
         axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
         plot.title = element_text(size = 16, face = "bold"))
+
 ```
 
 ### Fall
@@ -516,6 +674,7 @@ p6 <- ggplot() +
         axis.line.x = element_line(size = 0.5), 
         axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"), 
         plot.title = element_text(size = 16, face = "bold"))
+
 ```
 ## - Figure 3
 ```{r, fig.width = 16, fig.height=14}
@@ -531,6 +690,7 @@ p7 <- ggarrange(p1+theme(axis.title.x = element_blank()),
 
 ggsave(filename = "abundancefull.tiff", device = "tiff", plot = p7, path = "./Figures",
        dpi = 300, width = 16, height = 14, units = "in")
+
 ```
 
 # Survey Comparison
@@ -541,25 +701,39 @@ ggsave(filename = "abundancefull.tiff", device = "tiff", plot = p7, path = "./Fi
 Spring NLFPM estimates are representative of the same year's acoustic survey biomass estimates.
 
 Spring NLFPM: 1984-1995
-Spring acoustic: 1985-1996
+Spring acoustic: 1985-1995
 
-Correlation range: 1985-1995
+Correlation range: 1984-1995
 ```{r}
-load(file = "./ModelSaves/SprEng_Length.RData")
+load(file = "./ModelSaves/ACAP-SprEng_Length.RData")
+load(file = "./ModelSaves/GH-SprEng_Length.RData")
 
 eng_ac_surv <- read.csv("./Data/Capelin_AccSurv_85-2024.csv") %>% 
-  filter(year > 1980 & year < 1997)
+  filter(year >= 1984 & year < 1996)
 
-sort(unique(fishy_dat$year))[2:12]
-unique(eng_ac_surv$year)[1:11]
+sort(unique(ac_fishy_dat$year))
+unique(eng_ac_surv$year)
 
-# Set up relationship data frame
-lr_dat <- data.frame(year = as.factor(seq(1985,1995,1)), 
-                     acc_bm = eng_ac_surv$biomass_med[1:11], 
-                     NLFPM_bm = rep$iye[2:12]) 
+# Set up relationship data frame - ACAP
+ac_lr_dat <- data.frame(year = as.factor(seq(1984,1995,1)),
+                        acc_bm = c(NA, eng_ac_surv$biomass_med), 
+                        NLFPM_bm = ac_rep$iye)
 
 # Spearman correlation
-cor.test(x = lr_dat$NLFPM_bm, y = lr_dat$acc_bm, method = "spearman")
+cor.test(x = ac_lr_dat$NLFPM_bm, y = ac_lr_dat$acc_bm, method = "spearman")
+
+
+
+# Set up relationship data frame - GH
+sort(unique(gh_fishy_dat$year))
+
+gh_lr_dat <- data.frame(year = as.factor(seq(1984,1995,1)), 
+                        acc_bm = c(NA, eng_ac_surv$biomass_med), 
+                        NLFPM_bm = gh_rep$iye)
+
+
+# Spearman correlation
+cor.test(x = gh_lr_dat$NLFPM_bm, y = gh_lr_dat$acc_bm, method = "spearman")
 
 ```
 
@@ -575,7 +749,7 @@ load(file = "./ModelSaves/ACAP-FallEng_Length.RData")
 load(file = "./ModelSaves/GH-FallEng_Length.RData")
 
 eng_ac_surv <- read.csv("./Data/Capelin_AccSurv_85-2024.csv") %>% 
-  filter(year > 1980 & year < 1996)
+  filter(year >= 1984 & year < 1996)
 
 unique(ac_fishy_dat$year)
 unique(eng_ac_surv$year)
@@ -613,10 +787,10 @@ Spring NLFPM year is acoustic survey year.
 Spring NLFPM: 1996-2019
 Spring acoustic: 1995-2024
 
-Correlation range:
+Correlation range: 1996-2019
 ```{r}
-load(file = "./ModelSaves/ACAP-SprCamp_Base.RData")
-load(file = "./ModelSaves/GH-SprCamp_Base.RData")
+load(file = "./ModelSaves/ACAP-SprCamp_Length.RData")
+load(file = "./ModelSaves/GH-SprCamp_Length.RData")
 
 camp_ac_surv <- read.csv("./Data/Capelin_AccSurv_85-2024.csv") %>% 
   filter(year > 1994)
@@ -625,9 +799,9 @@ unique(ac_fishy_dat$year)
 unique(camp_ac_surv$year)
 
 # Set up relationship data frame - ACAP, yr = yr
-ac_lr_dat <- data.frame(year = as.factor(seq(1996,2019,1)), 
-                        acc_bm = camp_ac_surv$biomass_med[2:25], 
-                        NLFPM_bm = ac_rep$iye)
+ac_lr_dat <- data.frame(year = as.factor(seq(1995,2019,1)), 
+                        acc_bm = camp_ac_surv$biomass_med[1:25], 
+                        NLFPM_bm = c(NA, ac_rep$iye))
 
 # Spearman correlation
 cor.test(x = ac_lr_dat$NLFPM_bm, y = ac_lr_dat$acc_bm, method = "spearman")
@@ -636,9 +810,9 @@ cor.test(x = ac_lr_dat$NLFPM_bm, y = ac_lr_dat$acc_bm, method = "spearman")
 
 # Set up relationship data frame - GH, yr = yr
 unique(gh_fishy_dat$year)
-gh_lr_dat <- data.frame(year = as.factor(seq(1996,2019,1)), 
-                        acc_bm = camp_ac_surv$biomass_med[2:25], 
-                        NLFPM_bm = gh_rep$iye)
+gh_lr_dat <- data.frame(year = as.factor(seq(1995,2019,1)), 
+                        acc_bm = camp_ac_surv$biomass_med[1:25], 
+                        NLFPM_bm = c(NA, gh_rep$iye))
 
 
 # Spearman correlation
@@ -665,7 +839,7 @@ unique(camp_ac_surv$year)
 # Set up relationship data frame
 lr_dat <- data.frame(year = as.factor(seq(1996, 2021,1)), 
                      acc_bm = camp_ac_surv$biomass_med[2:27], 
-                     NLFPM_bm = rep$iye) 
+                     NLFPM_bm = rep$iye)
 
 # Spearman correlation
 cor.test(x = lr_dat$NLFPM_bm, y = lr_dat$acc_bm, method = "spearman")
@@ -675,59 +849,72 @@ cor.test(x = lr_dat$NLFPM_bm, y = lr_dat$acc_bm, method = "spearman")
 # y Timeseries comparison
 
 ## Engel
-spring range: 1984-1995
-AC fall range: 1984-1994
+ACAP spring range: 1984-1995
+GH spring range: 1984-1995
+ACAP fall range: 1984-1994
 GH fall range: 1984-1994
 
-Correlation ranging from 1985-1995
+Correlation ranging from 1984-1995
 ```{r}
-load(file = "./ModelSaves/SprEng_Length.RData")
+load(file = "./ModelSaves/ACAP-SprEng_Length.RData")
+acspr_fishy_dat <- ac_fishy_dat
+acspr_rep <- ac_rep
 load(file = "./ModelSaves/ACAP-FallEng_Length.RData")
+acsfall_fishy_dat <- ac_fishy_dat
+acfall_rep <- ac_rep
+load(file = "./ModelSaves/GH-SprEng_Length.RData")
+ghspr_fishy_dat <- gh_fishy_dat
+ghspr_rep <- gh_rep
 load(file = "./ModelSaves/GH-FallEng_Length.RData")
+ghfall_fishy_dat <- gh_fishy_dat
+ghfall_rep <- gh_rep
+
 
 # Look at year range
-sort(unique(fishy_dat$year))
-unique(ac_fishy_dat$year)
-unique(gh_fishy_dat$year)
+sort(unique(acspr_fishy_dat$year))
+sort(unique(ghspr_fishy_dat$year))
+unique(acsfall_fishy_dat$year)
+unique(ghfall_fishy_dat$year)
 
 # Set up relationship data frame
-lr_dat <- data.frame(year = as.factor(seq(1985,1995,1)), 
-                     SE = rep$iye[2:12],
-                     FEACAP = ac_rep$iye,
-                     FEGH = gh_rep$iye)
+lr_dat <- data.frame(year = as.factor(seq(1984,1995,1)), 
+                     SEACAP = acspr_rep$iye,
+                     SEGH = ghspr_rep$iye,
+                     FEACAP = c(acfall_rep$iye, NA),
+                     FEGH = c(ghfall_rep$iye, NA))
                      
 
 # ACAP
 # Spearman correlation
-cor.test(x = lr_dat$FEACAP, y = lr_dat$SE, method = "spearman")
+cor.test(x = lr_dat$FEACAP, y = lr_dat$SEACAP, method = "spearman")
 
  # GH
 # Spearman correlation
-cor.test(x = lr_dat$FEGH, y = lr_dat$SE, method = "spearman")
+cor.test(x = lr_dat$FEGH, y = lr_dat$SEGH, method = "spearman")
 
 ```
 
 ## Campelen
 fall range: 1995-2020
-acap spring range: 1996-2019
-gh spring range: 1996-2019
+ACAP spring range: 1996-2019
+GH spring range: 1996-2019
 
-Correlation ranging from 1996-2019
+Correlation ranging from 1995-2020
 ```{r}
 load(file = "./ModelSaves/FallCamp_Length.RData")
-load(file = "./ModelSaves/ACAP-SprCamp_Base.RData")
-load(file = "./ModelSaves/GH-SprCamp_Base.RData")
+load(file = "./ModelSaves/ACAP-SprCamp_Length.RData")
+load(file = "./ModelSaves/GH-SprCamp_Length.RData")
 
 # Look at year range
-unique(fishy_dat$year) # this will have to be lagged +1 yr
+unique(fishy_dat$year)
 unique(ac_fishy_dat$year)
 unique(gh_fishy_dat$year)
 
 # Set up relationship data frame
-lr_dat <- data.frame(year = as.factor(seq(1996,2019,1)), 
-                     FC = rep$iye[1:24], 
-                     SCACAP = ac_rep$iye, 
-                     SCGH = gh_rep$iye)
+lr_dat <- data.frame(year = as.factor(seq(1995,2020,1)), 
+                     FC = rep$iye, 
+                     SCACAP = c(NA, ac_rep$iye, NA), 
+                     SCGH = c(NA, gh_rep$iye, NA))
 
 
 # ACAP
@@ -740,74 +927,3 @@ cor.test(x = lr_dat$FC, y = lr_dat$SCACAP, method = "spearman")
 cor.test(x = lr_dat$FC, y = lr_dat$SCGH, method = "spearman")
 
 ```
-
-# y+1 Timeseries comparison
-
-## Engel
-spring range: 1984-1995
-AC fall range: 1984-1994
-GH fall range: 1984-1994
-
-Correlation ranging from 1984-1994
-```{r}
-load(file = "./ModelSaves/SprEng_Length.RData")
-load(file = "./ModelSaves/ACAP-FallEng_Length.RData")
-load(file = "./ModelSaves/GH-FallEng_Length.RData")
-
-# Look at year range
-sort(unique(fishy_dat$year))
-unique(ac_fishy_dat$year)
-unique(gh_fishy_dat$year)
-
-# Set up relationship data frame
-lr_dat <- data.frame(year = as.factor(seq(1984,1994,1)), 
-                     SE = rep$iye[1:11],
-                     FEACAP = ac_rep$iye,
-                     FEGH = gh_rep$iye)
-
-
-# ACAP
-# Spearman correlation
-cor.test(x = lr_dat$FEACAP, y = lr_dat$SE, method = "spearman")
-
-# GH
-# Spearman correlation
-cor.test(x = lr_dat$FEGH, y = lr_dat$SE, method = "spearman")
-
-```
-
-## Campelen
-fall range: 1995-2020
-acap spring range: 1996-2019
-gh spring range: 1996-2019
-
-Correlation ranging from 1996-2019
-```{r}
-load(file = "./ModelSaves/FallCamp_Length.RData")
-load(file = "./ModelSaves/ACAP-SprCamp_Base.RData")
-load(file = "./ModelSaves/GH-SprCamp_Base.RData")
-
-# Look at year range
-unique(fishy_dat$year)[2:25]
-unique(ac_fishy_dat$year)
-unique(gh_fishy_dat$year)
-
-# Set up relationship data frame
-lr_dat <- data.frame(year = as.factor(seq(1996,2019,1)), 
-                     FC = rep$iye[2:25], 
-                     SCACAP = ac_rep$iye, 
-                     SCGH = gh_rep$iye)
-
-
-# ACAP
-# Spearman correlation
-cor.test(x = lr_dat$FC, y = lr_dat$SCACAP, method = "spearman")
-
-
-# GH
-# Spearman correlation
-cor.test(x = lr_dat$FC, y = lr_dat$SCGH, method = "spearman")
-
-```
-
-
