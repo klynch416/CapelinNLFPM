@@ -1,7 +1,7 @@
 ---
 output: html_document
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 # Setup Env
 
@@ -455,8 +455,8 @@ fe <- ggplot(data = plotdf) +
 
 ```{r Fall Campelen, fig.height=8, fig.width=10}
 
-load(file = "./ModelSaves/ACAP-SprCamp_Length.RData")
-load(file = "./ModelSaves/GH-SprCamp_Length.RData")
+load(file = "./ModelSaves/ACAP-SprCamp_Base.RData")
+load(file = "./ModelSaves/GH-SprCamp_Base.RData")
 
 
 # Set up index df - GH
@@ -522,11 +522,9 @@ for(i in 1:(length(ac_uni_names)-1)){
 # Add all input data into one dataframe
 plotdf <- data.frame(time = gh_multi_inner[,1], 
                      ts = gh_multi_inner[,2],
-                     ac1 = ac_multi_inner[,6], 
-                     ac2 = ac_multi_inner[,7],
-                     gh1 = gh_multi_inner[,5],
-                     gh2 = gh_multi_inner[,6],
-                     ap1 = ac_multi_inner[,8]
+                     ac = ac_multi_inner[,5], 
+                     gh = gh_multi_inner[,4],
+                     ap = ac_multi_inner[,6]
                      )
 
 
@@ -534,16 +532,14 @@ plotdf <- data.frame(time = gh_multi_inner[,1],
 sc <- ggplot(data = plotdf) +  
   geom_line(aes(x = time, y = ts, colour = "trawl"), size = 1.4, linetype = "dashed") +
   
-  geom_line( aes(x = time, y = ac1, colour = "ac", linetype = "medium"), size = 1.4) +
-  geom_line(aes(x = time, y = ac2, colour = "ac", linetype = "large"), size = 1.4) +
+  geom_line( aes(x = time, y = ac, colour = "ac", linetype = "medium"), size = 1.4) +
   
-  geom_line(aes(x = time, y = gh1, colour = "gh", linetype = "medium"), size = 1.4) +
-  geom_line(aes(x = time, y = gh2, colour = "gh", linetype = "large"), size = 1.4) +
+  geom_line(aes(x = time, y = gh, colour = "gh", linetype = "medium"), size = 1.4) +
   
-  geom_line(aes(x = time, y = ap1, colour = "ap", linetype = "medium"), size = 1.4) +
+  geom_line(aes(x = time, y = ap, colour = "ap", linetype = "medium"), size = 1.4) +
   
   scale_x_continuous(name = "Year", expand = c(0,0.1), limits = c(1994.9,2022), breaks = c(seq(1995, 2022, 5))) + 
-  scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(-0.05, 2.3)) +
+  scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.82, 2.3)) +
   scale_color_manual(name = "", values = c(trawl = "brown", ac = "#BC8DA0", gh = "#048BA8", ap = "#AFD5AA"),
                      labels = c(trawl = "Trawl", ac = "Atlantic cod", gh = "Greenland halibut", ap = "American plaice")) +
   scale_linetype_manual(name = "", values = c(medium = "solid", large = "dotdash"),
@@ -940,7 +936,6 @@ old_full_freq <- old_full_stom %>% group_by(YEAR, season, alt.name, cap_pa) %>%
 ```
 
 ## - Figure Reviewer comment
-
 ```{r}
 ggplot() +
   geom_point(data = old_full_freq, aes(x = YEAR, y = freq, colour = 'old')) +

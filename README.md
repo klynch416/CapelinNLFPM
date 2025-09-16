@@ -41,8 +41,8 @@ This code is intended to allow readers/reviewers the ability to repeat analyses 
       - `FallCamp-TempLength.R` - R script for running fall Campelen data with the TempLength NLFPM (temperature and ontogentic effect)
     + `Spring/`
       - `SprCamp-SetUp.R` - R script for loading spring Campelen data for modelling
-      - `ACAP-SprCamp_Length.R` - R script for running Atlantic cod and American plaice spring Campelen data with the Length NLFPM
-      - `GH-SprCamp_Length.R` - R script for running Greenland halibut spring Campelen data with the Length NLFPM
+      - `ACAP-SprCamp_Base.R` - R script for running Atlantic cod and American plaice spring Campelen data with the Base NLFPM
+      - `GH-SprCamp_Base.R` - R script for running Greenland halibut spring Campelen data with the Base NLFPM
 * `Engel/`
     + `Fall/`
       - `FallEng-SetUp.R` - R script for loading fall Engel data for modelling 

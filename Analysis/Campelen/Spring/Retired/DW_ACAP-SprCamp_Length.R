@@ -13,7 +13,8 @@ dyn.load("./TMBcode/SppmonoTempNLFPM")
 
 
 # Set up data for model
-load(file = "./ModelSaves/Set_Up/SC-2019.RData")
+# load(file = "./ModelSaves/Set_Up/SC-2019.RData")
+source("./Analysis/Campelen/Spring/SprCamp-SetUp.R")
 
 ac_fishy_dat <- make_data(n = c(length(trawls$year), 
                                 length(ac1$year), length(ac2$year), 

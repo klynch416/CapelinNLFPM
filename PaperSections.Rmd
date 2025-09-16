@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
 # Setup Env
 
 ```{r include=FALSE}
@@ -597,8 +602,8 @@ p4 <- ggplot() +
 ### Spring
 
 ```{r}
-load(file = "./ModelSaves/ACAP-SprCamp_Length.RData")
-load(file = "./ModelSaves/GH-SprCamp_Length.RData")
+load(file = "./ModelSaves/ACAP-SprCamp_Base.RData")
+load(file = "./ModelSaves/GH-SprCamp_Base.RData")
 
 # Confidence intervals for Greenland halibut model
 gh_low_rho = gh_sdrep$value[names(gh_sdrep$value) == "iye"] - qnorm(0.975)*gh_sdrep$sd[names(gh_sdrep$value) == "iye"]
@@ -629,7 +634,7 @@ p5 <- ggplot() +
   geom_point(data = ac_ts_df, aes(x = time, y = ts, colour = "ac"), size = 1.5) +
   
   scale_x_continuous(name = "Year", expand = c(0,0.1), limits = c(1994.9,2022), breaks = c(seq(1995, 2022, 5))) + 
-  scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.59, 2.2)) +
+  scale_y_continuous(name = "NLFPM Abundance Index", expand = c(0,0), limits = c(0.55, 2.2)) +
   scale_color_manual(name = "Species Model",
                      breaks = c("all", "surv", "ac", "gh", "ap"), 
                      values = c(all = "black", surv = "#BB2D05", ac = "#BC8DA0", gh = "#048BA8", ap = "#FF7733"),
@@ -789,8 +794,8 @@ Spring acoustic: 1995-2024
 
 Correlation range: 1996-2019
 ```{r}
-load(file = "./ModelSaves/ACAP-SprCamp_Length.RData")
-load(file = "./ModelSaves/GH-SprCamp_Length.RData")
+load(file = "./ModelSaves/ACAP-SprCamp_Base.RData")
+load(file = "./ModelSaves/GH-SprCamp_Base.RData")
 
 camp_ac_surv <- read.csv("./Data/Capelin_AccSurv_85-2024.csv") %>% 
   filter(year > 1994)
@@ -902,8 +907,8 @@ GH spring range: 1996-2019
 Correlation ranging from 1995-2020
 ```{r}
 load(file = "./ModelSaves/FallCamp_Length.RData")
-load(file = "./ModelSaves/ACAP-SprCamp_Length.RData")
-load(file = "./ModelSaves/GH-SprCamp_Length.RData")
+load(file = "./ModelSaves/ACAP-SprCamp_Base.RData")
+load(file = "./ModelSaves/GH-SprCamp_Base.RData")
 
 # Look at year range
 unique(fishy_dat$year)

@@ -138,7 +138,7 @@ AP_stos <- stom_spr_good %>% filter(alt.name == "American plaice") %>% select(ye
 # Set up different length bins
 ac1 <- AC_stos %>% filter(length > 17 & length <= 45) %>% filter(year != 1998 & year != 2017) # removed years with fewer than 10 overall observations
 ac2 <- AC_stos %>% filter(length > 45) %>% filter(year != 2015)
-ap1 <- AP_stos %>% filter(length > 29)
+ap1 <- AP_stos %>% filter(length > 29) %>% filter(year != 2017)
 gh1 <- GH_stos %>% filter(length > 19 & length <= 40) %>% filter(year != 2017)
 gh2 <- GH_stos %>% filter(length > 40)
 

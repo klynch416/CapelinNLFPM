@@ -83,32 +83,6 @@ remSE <- ggplot() +
   theme(title = element_text(size = 15, face = "bold"),
         axis.title.y = element_blank(), axis.text =  element_text(size = 15), axis.title = element_text(size = 16, face = "bold"))
 
-
-
-#
-trawl_zero <- trawltoall %>% filter(both_colour_category == "Trawl_Zero")
-raster::rasterFromXYZ(x = trawl_zero$x, y = trawl_zero$y, z = trawl_zero$trawl_pa)
-
-
-# Get raster values for areas added by all data and not by trawl data
-trawl_rasValue <- raster::extract(all_mean_catch, trawl_zero[,c('x','y')])
-
-# Join lat & long values 
-trawl_combinePointValue <- cbind(trawl_cords, trawl_rasValue)
-
-
-trawl_good_coords <- data.frame("lat_dd" = trawl_zero$y, "long_dd" = trawl_zero$x)
-# Remove coords in original df with bad pa levels
-trawl_eng_good <- eng_spr %>% filter(lat_dd %in% trawl_good_coords$lat_dd & long_dd %in% -trawl_good_coords$long_dd) %>% rename(pa = trawl_pa)
-trawl_stom_good <- stom_spr %>% filter(lat_dd %in% trawl_good_coords$lat_dd & long_dd %in% -trawl_good_coords$long_dd)
-trawl_good <- rbind(trawl_eng_good[c('year','pa')], trawl_stom_good[c('year', 'pa')])
-
-
-
-
-
-
-
 ```
 
 ## Fall
