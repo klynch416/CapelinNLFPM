@@ -41,16 +41,22 @@ This code is intended to allow readers/reviewers the ability to repeat analyses 
       - `FallCamp-TempLength.R` - R script for running fall Campelen data with the TempLength NLFPM (temperature and ontogentic effect)
     + `Spring/`
       - `SprCamp-SetUp.R` - R script for loading spring Campelen data for modelling
-      - `ACAP-SprCamp_Base.R` - R script for running Atlantic cod and American plaice spring Campelen data with the Base NLFPM
-      - `GH-SprCamp_Base.R` - R script for running Greenland halibut spring Campelen data with the Base NLFPM
+      - `ACAP-SprCamp_Length.R` - R script for running Atlantic cod and American plaice spring Campelen data with the Length NLFPM
+      - `GH-SprCamp_Length.R` - R script for running Greenland halibut spring Campelen data with the Length NLFPM
 * `Engel/`
     + `Fall/`
       - `FallEng-SetUp.R` - R script for loading fall Engel data for modelling 
-      - `ACAP-FallEng_Length.R` - R script for running fall Engel data with the Length NLFPM
-      - `GH-FallEng_Length.R` - R script for running fall Engel data with the Length NLFPM
+      - `ACAP-FallEng_Length.R` - R script for running Atlantic cod and American plaice fall Engel data with the Length NLFPM
+      - `GH-FallEng_Length.R` - R script for running Greenland halibut fall Engel data with the Length NLFPM
     + `Spring`
       - `SprEng-SetUp.R` - R script for loading spring Engel data for modelling
-      - `SprEng_Length.R` - R script for running spring Engel data with the Length NLFPM
+      - `ACAP-SprEng_Length.R` - R script for running Atlantic cod and American plaice spring Engel data with the Length NLFPM
+      - `GH-SprEng_Length.R` - R script for running Greenland halibut spring Engel data with the Length NLFPM
+
+`Functions` - Folder containing Rscripts used to set up model functions
+* `make_data.R` - R script for creating basic data.frame() for the model
+* `model_data.R` - R script for creating data list() for functional response model, passed to TMB
+* `model_param.R` - R script for creating parameter list() for for functional response model, passed to TMB
 
 `TMBcode/` - Folder containing C++ code for running models 
 
@@ -68,6 +74,8 @@ This code is intended to allow readers/reviewers the ability to repeat analyses 
 `PaperSections.Rmd` - R markdown aggregating code used for analysis in publication
 
 `README.md` - README file formatted for Github
+
+`ReviewerComment.Rmd` - R markdown aggregating code used for response to reviewer comment about using trawl data to subset observations rather than all available data
 
 `SuppSections.Rmd` - R markdown aggregating code used for supplemental material accompanying the publication
 
