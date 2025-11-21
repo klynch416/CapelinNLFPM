@@ -69,8 +69,9 @@ pMSE <- ggplot() +
   scale_fill_viridis_c(name = "Proportion of \ncapelin catches", limits = c(0,1)) +
   ggtitle("Engel\na) 3L Spring ") +
   
-  annotation_scale(location = "br") +
+  annotation_scale(location = "br", plot_unit = "km") +
   annotation_north_arrow(location = "tr", which_north = "true", height = unit(0.7, "cm"), width = unit(0.7, "cm")) +
+  coord_sf(crs = "EPSG:4269") +
 
   theme_minimal() +
   theme(legend.position = "none", title = element_text(size = 15, face = "bold"),
@@ -103,7 +104,7 @@ pMFE <- ggplot() +
   geom_tile(data = filter(capelin_catch_raster, color_category == "Non-Zero"), aes(x = x, y = y, fill = pa)) +
   
   geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
-  
+
   geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")), fontface = 2, size = 6) +
   geom_sf(data = JKsubocean,  color = "red", linewidth = 0.5, fill = NA) +
   geom_sf(data = Lsubocean, colour = "red", linewidth = 0.5, fill = NA) +
@@ -114,8 +115,9 @@ pMFE <- ggplot() +
   scale_fill_viridis_c(name = "Proportion of \ncapelin catches", limits = c(0,1)) +
   ggtitle("c) 2J3KL Fall") +
 
-  annotation_scale(location = "br") +
+  annotation_scale(location = "br", plot_unit = "km") +
   annotation_north_arrow(location = "tr", which_north = "true", height = unit(0.7, "cm"), width = unit(0.7, "cm")) +
+  coord_sf(crs = "EPSG:4269") +
 
   theme_minimal() +
   theme(legend.position = "none", title = element_text(size = 15, face = "bold"),
@@ -147,7 +149,7 @@ capelin_catch_raster <- capelin_catch_raster %>%  mutate(color_category = ifelse
 pMSC <- ggplot() +
   geom_tile(data = filter(capelin_catch_raster, color_category == "Zero"), aes(x = x, y = y), fill = "grey80") +
   geom_tile(data = filter(capelin_catch_raster, color_category == "Non-Zero"), aes(x = x, y = y, fill = pa)) +
-  
+
   geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
 
   geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")), fontface = 2, size = 6) +
@@ -160,8 +162,9 @@ pMSC <- ggplot() +
   scale_fill_viridis_c(name = "Proportion of \ncapelin catches", limits = c(0,1)) +
   ggtitle("Campelen\nb) 3L Spring") + 
 
-  annotation_scale(location = "br") +
+  annotation_scale(location = "br", plot_unit = "km") +
   annotation_north_arrow(location = "tr", which_north = "true", height = unit(0.7, "cm"), width = unit(0.7, "cm")) +
+  coord_sf(crs = "EPSG:4269") +
 
   theme_minimal() +
   theme(title = element_text(size = 15, face = "bold"), legend.text = element_text(size = 12),
@@ -195,19 +198,20 @@ pMFC <- ggplot() +
   geom_tile(data = filter(capelin_catch_raster, color_category == "Non-Zero"), aes(x = x, y = y, fill = pa)) +
 
   geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
-  
-  geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J", "3K", "3L")), fontface = 2, size = 6) +
+
+  geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")), fontface = 2, size = 6) +
   geom_sf(data = JKsubocean,  color = "red", linewidth = 0.5, fill = NA) +
   geom_sf(data = Lsubocean, colour = "red", linewidth = 0.5, fill = NA) +
   geom_sf(data = acsurv, colour = "blue", linewidth = 0.5, fill = NA) +
-
+  
   scale_x_continuous(name = "Longitude", limits = c(-59, -42), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
   scale_y_continuous(name = "Latitude", limits = c(45, 56), breaks = c(seq(46, 56, 4)), expand = c(0,0)) +
   scale_fill_viridis_c(name = "Proportion of \ncapelin catches", limits = c(0,1)) +
   ggtitle("d) 2J3KL Fall") + 
 
-  annotation_scale(location = "br") +
+  annotation_scale(location = "br", plot_unit = "km") +
   annotation_north_arrow(location = "tr", which_north = "true", height = unit(0.7, "cm"), width = unit(0.7, "cm")) +
+  coord_sf(crs= "EPSG:4269") +
 
   theme_minimal() +
   theme(legend.position = "none", title = element_text(size = 15, face = "bold"),
@@ -241,6 +245,7 @@ ggsave(filename = "datamaps.tiff", device = "tiff", plot = pmaps, path = "./Figu
 ### Spring
 ```{r}
 load(file = "./ModelSaves/Set_Up/SE-1995.RData")
+source("./Analysis/Engel/Spring/SprEng-SetUp.R")
 
 Eacs1 <- AC_stos %>% filter(length > 17 & length <= 45) %>% filter(year != 1995)
 Eacs2 <- AC_stos %>% filter(length > 45) %>% filter(year != 1995)
@@ -257,6 +262,7 @@ Eghs0 <- GH_stos %>% filter(length < 20) %>% filter(year != 1984)
 ### Fall
 ```{r}
 load(file = "./ModelSaves/Set_Up/FE-1994.RData")
+source("./Analysis/Engel/Fall/FallEng-SetUp.R")
 
 Eacf1 <- AC_stof %>% filter(length > 17 & length <= 45)
 Eacf2 <- AC_stof %>% filter(length > 45) %>% filter(year != 1994)
@@ -275,6 +281,7 @@ Eghf0 <- GH_stof %>% filter(length < 20)
 ### Spring
 ```{r}
 load(file = "./ModelSaves/Set_Up/SC-2019.RData")
+source("./Analysis/Campelen/Spring/SprCamp-SetUp.R")
 
 Cacs1 <- AC_stos %>% filter(length > 17 & length <= 45) %>% filter(year != 1998 & year != 2017)
 Cacs2 <- AC_stos %>% filter(length > 45) %>% filter(year != 2015)
@@ -292,6 +299,7 @@ Cghs0 <- GH_stos %>% filter(length < 20) %>% filter(year != 2017)
 ```{r}
 # load rstrap set data
 load(file = "./ModelSaves/Set_Up/FC-2020.RData")
+source("./Analysis/Campelen/Fall/FallCamp-SetUp.R")
 
 Cacf1 <- AC_stof %>% filter(length > 17 & length <= 45)
 Cacf2 <- AC_stof %>% filter(length > 45) %>% filter(year != 1995)
@@ -380,14 +388,15 @@ sample_size <- data.frame(
                nrow(filter(Tgh2, geartype == "engel" & season == "fall" & content == "full")),
                nrow(filter(Tap0, geartype == "engel" & season == "fall" & content == "full")),
                nrow(filter(Tap1, geartype == "engel" & season == "fall" & content == "full"))),
-  E.pempty =  c(nrow(filter(Tac0, geartype == "engel" & pa == "0"))/nrow(filter(Tac0, geartype == "engel"))*100,
+  E.pemptycapelin =  c(nrow(filter(Tac0, geartype == "engel" & pa == "0"))/nrow(filter(Tac0, geartype == "engel"))*100,
                 nrow(filter(Tac1, geartype == "engel" & pa == "0"))/nrow(filter(Tac1, geartype == "engel"))*100,
                 nrow(filter(Tac2, geartype == "engel" & pa == "0"))/nrow(filter(Tac2, geartype == "engel"))*100,
                 nrow(filter(Tgh0, geartype == "engel" & pa == "0"))/nrow(filter(Tgh0, geartype == "engel"))*100,
                 nrow(filter(Tgh1, geartype == "engel" & pa == "0"))/nrow(filter(Tgh1, geartype == "engel"))*100,
                 nrow(filter(Tgh2, geartype == "engel" & pa == "0"))/nrow(filter(Tgh2, geartype == "engel"))*100,
                 nrow(filter(Tap0, geartype == "engel" & pa == "0"))/nrow(filter(Tap0, geartype == "engel"))*100,
-                nrow(filter(Tap1, geartype == "engel" & pa == "0"))/nrow(filter(Tap1, geartype == "engel"))*100),  E.pemptycapelin =  c(nrow(filter(Tac0, geartype == "engel" & empty == "1"))/nrow(filter(Tac0, geartype == "engel"))*100,
+                nrow(filter(Tap1, geartype == "engel" & pa == "0"))/nrow(filter(Tap1, geartype == "engel"))*100),  
+  E.pempty =  c(nrow(filter(Tac0, geartype == "engel" & empty == "1"))/nrow(filter(Tac0, geartype == "engel"))*100,
                 nrow(filter(Tac1, geartype == "engel" & empty == "1"))/nrow(filter(Tac1, geartype == "engel"))*100,
                 nrow(filter(Tac2, geartype == "engel" & empty == "1"))/nrow(filter(Tac2, geartype == "engel"))*100,
                 nrow(filter(Tgh0, geartype == "engel" & empty == "1"))/nrow(filter(Tgh0, geartype == "engel"))*100,
@@ -436,7 +445,7 @@ sample_size <- data.frame(
                 nrow(filter(Tgh2, geartype == "campelen" & pa == "0"))/nrow(filter(Tgh2, geartype == "campelen"))*100,
                 nrow(filter(Tap0, geartype == "campelen" & pa == "0"))/nrow(filter(Tap0, geartype == "campelen"))*100,
                 nrow(filter(Tap1, geartype == "campelen" & pa == "0"))/nrow(filter(Tap1, geartype == "campelen"))*100),
-  C.pempty =  c(nrow(filter(Tac0, geartype == "campelen" & empty == "0"))/nrow(filter(Tac0, geartype == "campelen"))*100,
+  C.pempty =  c(nrow(filter(Tac0, geartype == "campelen" & empty == "1"))/nrow(filter(Tac0, geartype == "campelen"))*100,
                 nrow(filter(Tac1, geartype == "campelen" & empty == "1"))/nrow(filter(Tac1, geartype == "campelen"))*100,
                 nrow(filter(Tac2, geartype == "campelen" & empty == "1"))/nrow(filter(Tac2, geartype == "campelen"))*100,
                 nrow(filter(Tgh0, geartype == "campelen" & empty == "1"))/nrow(filter(Tgh0, geartype == "campelen"))*100,
@@ -449,7 +458,7 @@ sample_size <- data.frame(
 
 sample_size <- sample_size %>% mutate(E.pemptycapelin = format(E.pemptycapelin, digits = 4), C.pemptycapelin = format(C.pemptycapelin, digits = 4), E.pempty = format(E.pempty, digits = 4), C.pempty = format(C.pempty, digits = 4))
 
-write.csv(x = sample_size, file = "./Extra/samplesize.csv")
+write.csv(x = sample_size, file = "./samplesize-fixed.csv")
 
 ```
 

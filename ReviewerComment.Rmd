@@ -66,14 +66,14 @@ trawltoall <- trawltoall %>% mutate(both_colour_category = NA,
 
 # plot
 remSE <- ggplot() +
-  geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
+  geom_sf(data = st_transform(ne_states(country = "canada", returnclass = "sf"), "EPSG:4269"), colour = "black", fill = "lightgrey") +
 
   geom_raster(data = trawltoall, aes(x = x, y = y, fill = pa)) +
 
   geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")), fontface = 2, size = 6) +
-  geom_sf(data = JKsubocean,  color = "red", linewidth = 0.5, fill = NA) +
-  geom_sf(data = Lsubocean, colour = "red", linewidth = 0.5, fill = NA) +
-  geom_sf(data = acsurv, colour = "blue", linewidth = 0.5, fill = NA) +
+  geom_sf(data = st_transform(JKsubocean, "EPSG:4269"),  color = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = st_transform(Lsubocean, "EPSG:4269"), colour = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = st_transform(acsurv, "EPSG:4269"), colour = "blue", linewidth = 0.5, fill = NA) +
   ggtitle("Engel\na) 3L Spring") + 
 
   scale_x_continuous(name = "Longitude", limits = c(-59, -42), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
@@ -124,14 +124,14 @@ trawltoall <- trawltoall %>% mutate(both_colour_category = NA,
 
 # plot
 remFE <- ggplot() +
-  geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
+  geom_sf(data = st_transform(ne_states(country = "canada", returnclass = "sf"), "EPSG:4269"), colour = "black", fill = "lightgrey") +
 
   geom_raster(data = trawltoall, aes(x = x, y = y, fill = pa)) +
 
   geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")), fontface = 2, size = 6) +
-  geom_sf(data = JKsubocean,  color = "red", linewidth = 0.5, fill = NA) +
-  geom_sf(data = Lsubocean, colour = "red", linewidth = 0.5, fill = NA) +
-  geom_sf(data = acsurv, colour = "blue", linewidth = 0.5, fill = NA) +
+  geom_sf(data = st_transform(JKsubocean, "EPSG:4269"),  color = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = st_transform(Lsubocean, "EPSG:4269"), colour = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = st_transform(acsurv, "EPSG:4269"), colour = "blue", linewidth = 0.5, fill = NA) +
   ggtitle("c) 2J3KL Fall") + 
   
   scale_x_continuous(name = "Longitude", limits = c(-59, -42), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
@@ -182,14 +182,14 @@ trawltoall <- trawltoall %>% mutate(both_colour_category = NA,
 
 # plot
 remSC <- ggplot() +
-  geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
+  geom_sf(data = st_transform(ne_states(country = "canada", returnclass = "sf"), "EPSG:4269"), colour = "black", fill = "lightgrey") +
 
   geom_raster(data = trawltoall, aes(x = x, y = y, fill = pa)) +
 
   geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")), fontface = 2, size = 6) +
-  geom_sf(data = JKsubocean,  color = "red", linewidth = 0.5, fill = NA) +
-  geom_sf(data = Lsubocean, colour = "red", linewidth = 0.5, fill = NA) +
-  geom_sf(data = acsurv, colour = "blue", linewidth = 0.5, fill = NA) +
+  geom_sf(data = st_transform(JKsubocean, "EPSG:4269"),  color = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = st_transform(Lsubocean, "EPSG:4269"), colour = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = st_transform(acsurv, "EPSG:4269"), colour = "blue", linewidth = 0.5, fill = NA) +
   ggtitle("Campelen\nb) 3L Spring") + 
   
   scale_x_continuous(name = "Longitude", limits = c(-59, -42), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +
@@ -239,14 +239,14 @@ trawltoall <- trawltoall %>% mutate(both_colour_category = NA,
 
 # plot
 remFC <- ggplot() +
-  geom_sf(data = ne_states(country = "canada", returnclass = "sf"), colour = "black", fill = "lightgrey") +
+  geom_sf(data = st_transform(ne_states(country = "canada", returnclass = "sf"), "EPSG:4269"), colour = "black", fill = "lightgrey") +
 
   geom_raster(data = trawltoall, aes(x = x, y = y, fill = pa)) +
 
   geom_spatial_text(aes(x = -48.5, y = c(53.5, 51, 47.5), label = c("2J","3K","3L")), fontface = 2, size = 6) +
-  geom_sf(data = JKsubocean,  color = "red", linewidth = 0.5, fill = NA) +
-  geom_sf(data = Lsubocean, colour = "red", linewidth = 0.5, fill = NA) +
-  geom_sf(data = acsurv, colour = "blue", linewidth = 0.5, fill = NA) +
+  geom_sf(data = st_transform(JKsubocean, "EPSG:4269"),  color = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = st_transform(Lsubocean, "EPSG:4269"), colour = "red", linewidth = 0.5, fill = NA) +
+  geom_sf(data = st_transform(acsurv, "EPSG:4269"), colour = "blue", linewidth = 0.5, fill = NA) +
   ggtitle("d) 2J3KL Fall") + 
   
   scale_x_continuous(name = "Longitude", limits = c(-59, -42), breaks = c(seq(-59, -42, 4)), expand = c(0,0)) +

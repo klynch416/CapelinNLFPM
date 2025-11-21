@@ -47,26 +47,26 @@ call_fall <- call_fall %>%
 
 
 # Full stomach data
-# full_fall <- read.csv("./Data/NAFC_diet_capelin_COD_TURBOT_PLAICE_2J3KL_2025UPDATE_allprey.csv") %>%
-#   filter(YEAR >= 1984 & YEAR  <= 2020)
+# full_stom <- read.csv("./Data/NAFC_diet_capelin_COD_TURBOT_PLAICE_2J3KL_2025UPDATE_allprey.csv") %>%
+#   filter(YEAR > 1983 & YEAR < 2021)
 # 
-# prey1 <- full_fall %>% group_by(ID_PRED) %>% slice(which.max(MASS))
+# prey1 <- full_stom %>% group_by(ID_PRED) %>% slice(which.max(MASS))
 # #retain only elements in stomach not equal to elements in prey1, rows from df1 which are not in df2
-# prey2 <- setdiff(full_fall, prey1) %>% group_by(ID_PRED) %>% 
+# prey2 <- setdiff(full_stom, prey1) %>% group_by(ID_PRED) %>% 
 #   slice(which.max(MASS)) #find new highest prey mass
 # 
-# uni_full_fall <- full_fall %>% select(!c(TOT_PREY_NUMBER:MASS)) %>% unique() %>% # create unique pred obs dataframe
+# uni_full_stom <- full_stom %>% select(!c(TOT_PREY_NUMBER:MASS)) %>% unique() %>% # create unique pred obs dataframe
 #   mutate(prey1 = NA, # add prey1 and prey2 columns to fill
 #          prey2 = NA)
 # 
 # # match prey1 and prey2 for each ID_PRED, this step takes a while
-# pb <- txtProgressBar(min = 0,max = nrow(uni_full_fall),style = 3,width = 50,char = "=")
-# for(i in 1:nrow(uni_full_fall)){  
-#   uni_full_fall[i, 'prey1'] <- prey1[prey1$ID_PRED==uni_full_fall$ID_PRED[i], ]$PREY_GR_RAP
+# pb <- txtProgressBar(min = 0,max = nrow(uni_full_stom),style = 3,width = 50,char = "=")
+# for(i in 1:nrow(uni_full_stom)){  
+#   uni_full_stom[i, 'prey1'] <- prey1[prey1$ID_PRED == uni_full_stom$ID_PRED[i], ]$PREY_GR_RAP
 #   # not all preds have top prey2. match which ones do, NA for those that dont
-#   if(uni_full_fall$ID_PRED[i] %in% unique(prey2$ID_PRED)){
-#     uni_full_fall[i, 'prey2'] <- prey2[prey2$ID_PRED==uni_full_fall$ID_PRED[i], ]$PREY_GR_RAP
-#   } else(uni_full_fall[i, 'prey2'] <- NA)
+#   if(uni_full_stom$ID_PRED[i] %in% unique(prey2$ID_PRED)){
+#     uni_full_stom[i, 'prey2'] <- prey2[prey2$ID_PRED == uni_full_stom$ID_PRED[i], ]$PREY_GR_RAP
+#   } else(uni_full_stom[i, 'prey2'] <- NA)
 #   setTxtProgressBar(pb, i)
 # }
 # close(pb) # Close the connection
@@ -82,7 +82,7 @@ full_fall <- uni_full_stom %>% rename(year = YEAR, month = MONTH, length = LENGT
          alt.name = ifelse(alt.name == "438", "Atlantic cod", alt.name),
          alt.name = ifelse(alt.name == "892", "Greenland halibut", alt.name),
          content = rep("full", length(PRED_COMM_NAME)),
-         empty = ifelse(prey1 == "Empty", 1, 0),
+         empty = ifelse(prey1 == "Empty"|prey1 == "Emtpy", 1, 0),
          season = ifelse(month == 3|month == 4|month == 5|month == 6|month == 7, "spring", "fall"))
 full_fall <- left_join(full_fall, 
                        setdet %>% select(v.t.s, set.depth.max, data.series, bot.temp), by = c("v.t.s"), multiple = "any") %>%
